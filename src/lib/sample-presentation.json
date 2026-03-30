@@ -27,12 +27,27 @@
       "id": "s1",
       "number": 1,
       "summary": "Title slide with presentation name and speaker info",
-      "layout": { "columns": "1fr", "rows": "auto auto auto auto", "gap": "1rem" },
+      "layout": { "columns": "1fr", "rows": "auto auto auto auto", "gap": "1.5rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/2", "component": "Heading", "props": { "text": "Cloud + AI: ", "level": 1, "align": "center", "accentText": "The Builder's Playbook" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "Body", "props": { "markdown": "Strategies for What Comes Next in Cloud Engineering" } },
-        { "id": "c3", "gridArea": "3/1/4/2", "component": "Divider", "props": { "style": "gradient" } },
-        { "id": "c4", "gridArea": "4/1/5/2", "component": "Body", "props": { "markdown": "**Dhaval Nagar** -- AWS Hero | Founder, AppGambit" } }
+        {
+          "id": "c1", "gridArea": "1/1/2/2", "component": "Heading",
+          "props": { "text": "Cloud + AI: ", "level": 1, "align": "center", "accentText": "The Builder's Playbook" },
+          "decoration": { "fontSize": "6xl", "align": "center" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "Body",
+          "props": { "markdown": "Strategies for What Comes Next in Cloud Engineering" },
+          "decoration": { "fontSize": "xl", "align": "center", "textColor": "var(--slide-text-muted)" }
+        },
+        {
+          "id": "c3", "gridArea": "3/1/4/2", "component": "Divider",
+          "props": { "style": "gradient" }
+        },
+        {
+          "id": "c4", "gridArea": "4/1/5/2", "component": "Body",
+          "props": { "markdown": "**Dhaval Nagar** -- AWS Hero | Founder, AppGambit" },
+          "decoration": { "align": "center", "fontSize": "lg" }
+        }
       ],
       "speakerNotes": "Welcome everyone.",
       "animations": "fade",
@@ -41,68 +56,153 @@
     {
       "id": "s2",
       "number": 2,
-      "summary": "AI superpower - what AI handles vs what you do",
-      "layout": { "columns": "1fr 1fr", "rows": "auto 1fr", "gap": "1.5rem" },
+      "summary": "The Playbook opener -- what AI frees you up to create",
+      "layout": { "columns": "1fr 1fr", "rows": "auto 1fr", "gap": "2rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/3", "component": "Heading", "props": { "text": "AI is Your New ", "level": 1, "align": "center", "accentText": "Superpower" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "BulletList", "props": { "items": ["Write S3 policies & Lambda functions", "Scaffold CDK stacks", "Generate boilerplate APIs", "Parse logs and create alert rules"], "icon": "check-circle" } },
-        { "id": "c3", "gridArea": "2/2/3/3", "component": "BulletList", "props": { "items": ["Design creative architectures", "Solve problems no one else sees", "Build 10x faster than before", "Ship ideas in days, not months"], "icon": "zap" } }
+        {
+          "id": "c1", "gridArea": "1/1/2/2", "component": "Heading",
+          "props": { "text": "The ", "level": 1, "accentText": "Playbook Starts Here" },
+          "decoration": { "fontSize": "4xl" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "Body",
+          "props": { "markdown": "\"AI can now write infrastructure code, generate APIs, and deploy from a text prompt. So what does that free **YOU** up to create?\"\n\nThe boring parts got automated.\n**The creative parts got amplified.**\n\nThe Playbook is simple: Use AI to handle the boilerplate, so you can focus on what actually matters: *solving real problems*." },
+          "decoration": { "fontSize": "lg" }
+        },
+        {
+          "id": "c3", "gridArea": "1/2/3/3", "component": "BulletList",
+          "props": { "items": ["Impact > Syntax", "Speed > Boilerplate", "People > Servers"], "icon": "zap" },
+          "decoration": { "variant": "elevated", "icon": "layout", "fontSize": "xl", "align": "left", "padding": "2rem" }
+        }
       ],
-      "speakerNotes": "Emphasize the positive.",
+      "speakerNotes": "Frame AI as an amplifier, not a replacement.",
       "animations": "slide-left",
       "decorations": []
     },
     {
       "id": "s3",
       "number": 3,
-      "summary": "Comparison table",
-      "layout": { "columns": "1fr", "rows": "auto 1fr", "gap": "1.5rem" },
+      "summary": "AI superpower - what AI handles vs what you do",
+      "layout": { "columns": "1fr 1fr", "rows": "auto 1fr", "gap": "1.5rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/2", "component": "Heading", "props": { "text": "AI + You = ", "level": 1, "align": "center", "accentText": "Superpowers" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "ComparisonTable", "props": { "headers": ["AI Handles", "You Bring", "Together"], "rows": [["Boilerplate code", "What to build & why", "Ship in hours"], ["CRUD APIs", "Architecture decisions", "Scalable systems"], ["Log parsing", "Cost tradeoffs", "Lean products"], ["Documentation", "Debugging under pressure", "Reliable apps"]] } }
+        {
+          "id": "c1", "gridArea": "1/1/2/3", "component": "Heading",
+          "props": { "text": "AI is Your New ", "level": 1, "align": "center", "accentText": "Superpower" },
+          "decoration": { "fontSize": "5xl", "align": "center" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "BulletList",
+          "props": { "items": ["Write S3 policies & Lambda functions", "Scaffold CDK stacks", "Generate boilerplate APIs", "Parse logs and create alert rules"], "icon": "check-circle" },
+          "decoration": { "variant": "elevated", "borderAccent": "#EF4444", "fontSize": "lg", "animate": "slide-up" }
+        },
+        {
+          "id": "c3", "gridArea": "2/2/3/3", "component": "BulletList",
+          "props": { "items": ["Design creative architectures", "Solve problems no one else sees", "Build 10x faster than before", "Ship ideas in days, not months"], "icon": "zap" },
+          "decoration": { "variant": "elevated", "borderAccent": "#FF9900", "fontSize": "lg", "animate": "slide-up" }
+        }
       ],
-      "speakerNotes": "Walk through each row.",
+      "speakerNotes": "Emphasize the positive.",
       "animations": "fade",
       "decorations": []
     },
     {
       "id": "s4",
       "number": 4,
-      "summary": "AWS free credits stat with programs",
-      "layout": { "columns": "1fr 2fr", "rows": "auto 1fr", "gap": "1.5rem" },
+      "summary": "Comparison table",
+      "layout": { "columns": "1fr", "rows": "auto 1fr", "gap": "2rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/3", "component": "Heading", "props": { "text": "AWS Has ", "level": 1, "accentText": "Your Back" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "StatCallout", "props": { "value": "$200", "label": "Free Credits for Students" } },
-        { "id": "c3", "gridArea": "2/2/3/3", "component": "CardGrid", "props": { "cards": [{ "icon": "book-open", "title": "AWS Educate", "desc": "Free cloud labs" }, { "icon": "users", "title": "Cloud Clubs", "desc": "Student communities" }, { "icon": "award", "title": "Skill Builder", "desc": "600+ free courses" }], "columns": 3 } }
+        {
+          "id": "c1", "gridArea": "1/1/2/2", "component": "Heading",
+          "props": { "text": "AI + You = ", "level": 1, "align": "center", "accentText": "Superpowers" },
+          "decoration": { "fontSize": "5xl", "align": "center" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "ComparisonTable",
+          "props": { "headers": ["AI Handles", "You Bring", "Together"], "rows": [["Boilerplate code", "What to build & why", "Ship in hours"], ["CRUD APIs", "Architecture decisions", "Scalable systems"], ["Log parsing", "Cost tradeoffs", "Lean products"], ["Documentation", "Debugging under pressure", "Reliable apps"]] },
+          "decoration": { "fontSize": "lg" }
+        }
+      ],
+      "speakerNotes": "Walk through each row.",
+      "animations": "fade",
+      "decorations": []
+    },
+    {
+      "id": "s5",
+      "number": 5,
+      "summary": "AWS free credits stat with programs",
+      "layout": { "columns": "1fr 2fr", "rows": "auto 1fr", "gap": "2rem" },
+      "cells": [
+        {
+          "id": "c1", "gridArea": "1/1/2/3", "component": "Heading",
+          "props": { "text": "AWS Has ", "level": 1, "accentText": "Your Back" },
+          "decoration": { "fontSize": "5xl" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "StatCallout",
+          "props": { "value": "$200", "label": "Free Credits for Students" },
+          "decoration": { "variant": "elevated", "glow": true, "animate": "scale" }
+        },
+        {
+          "id": "c3", "gridArea": "2/2/3/3", "component": "CardGrid",
+          "props": { "cards": [{ "icon": "book-open", "title": "AWS Educate", "desc": "Free cloud labs" }, { "icon": "users", "title": "Cloud Clubs", "desc": "Student communities" }, { "icon": "award", "title": "Skill Builder", "desc": "600+ free courses" }], "columns": 3 }
+        }
       ],
       "speakerNotes": "All of this is free.",
       "animations": "scale",
       "decorations": ["glow-pulse"]
     },
     {
-      "id": "s5",
-      "number": 5,
+      "id": "s6",
+      "number": 6,
       "summary": "No more excuses challenge",
-      "layout": { "columns": "1fr", "rows": "auto 1fr auto auto", "gap": "0.75rem" },
+      "layout": { "columns": "1fr", "rows": "auto 1fr auto auto", "gap": "1rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/2", "component": "Heading", "props": { "text": "You have...", "level": 1, "align": "center" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "BulletList", "props": { "items": ["AI that writes production code for you", "Kiro, Q Developer, Copilot -- all free tiers", "$200 in AWS credits, free labs, free courses", "A global community of builders to learn from"], "icon": "check-circle" } },
-        { "id": "c3", "gridArea": "3/1/4/2", "component": "CTABox", "props": { "text": "...and you're going to build another TODO app?\nOr spend that time scrolling instead of shipping?" } },
-        { "id": "c4", "gridArea": "4/1/5/2", "component": "QuoteBlock", "props": { "text": "No generation before you had these tools for free. The only thing between you and something meaningful is deciding to start." } }
+        {
+          "id": "c1", "gridArea": "1/1/2/2", "component": "Heading",
+          "props": { "text": "You have...", "level": 1, "align": "center" },
+          "decoration": { "fontSize": "5xl", "align": "center" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "BulletList",
+          "props": { "items": ["AI that writes production code for you", "Kiro, Q Developer, Copilot -- all free tiers", "$200 in AWS credits, free labs, free courses", "A global community of builders to learn from"], "icon": "check-circle" },
+          "decoration": { "fontSize": "xl" }
+        },
+        {
+          "id": "c3", "gridArea": "3/1/4/2", "component": "CTABox",
+          "props": { "text": "...and you're going to build another TODO app?\nOr spend that time scrolling instead of shipping?" },
+          "decoration": { "animate": "scale" }
+        },
+        {
+          "id": "c4", "gridArea": "4/1/5/2", "component": "QuoteBlock",
+          "props": { "text": "No generation before you had these tools for free. The only thing between you and something meaningful is deciding to start." },
+          "decoration": { "fontSize": "xl" }
+        }
       ],
       "speakerNotes": "Pause after the TODO app line.",
       "animations": "stagger",
       "decorations": []
     },
     {
-      "id": "s6",
-      "number": 6,
+      "id": "s7",
+      "number": 7,
       "summary": "Mission - three action steps",
-      "layout": { "columns": "1fr", "rows": "auto 1fr auto", "gap": "1.5rem" },
+      "layout": { "columns": "1fr", "rows": "auto 1fr auto", "gap": "2rem" },
       "cells": [
-        { "id": "c1", "gridArea": "1/1/2/2", "component": "Heading", "props": { "text": "Your ", "level": 1, "align": "center", "accentText": "Mission" } },
-        { "id": "c2", "gridArea": "2/1/3/2", "component": "NumberedSteps", "props": { "steps": [{ "title": "Experiment this week", "desc": "Sign up for AWS Free Tier. Try Kiro IDE. Build something." }, { "title": "Solve a real problem", "desc": "Pick something your campus or community needs." }, { "title": "Share what you learn", "desc": "GitHub, Blog, LinkedIn. Teaching is the fastest way to grow." }], "style": "hero" } },
-        { "id": "c3", "gridArea": "3/1/4/2", "component": "QuoteBlock", "props": { "text": "The world needs builders who understand real problems. That's you. Go build." } }
+        {
+          "id": "c1", "gridArea": "1/1/2/2", "component": "Heading",
+          "props": { "text": "Your ", "level": 1, "align": "center", "accentText": "Mission" },
+          "decoration": { "fontSize": "5xl", "align": "center" }
+        },
+        {
+          "id": "c2", "gridArea": "2/1/3/2", "component": "NumberedSteps",
+          "props": { "steps": [{ "title": "Experiment this week", "desc": "Sign up for AWS Free Tier. Try Kiro IDE. Build something." }, { "title": "Solve a real problem", "desc": "Pick something your campus or community needs." }, { "title": "Share what you learn", "desc": "GitHub, Blog, LinkedIn. Teaching is the fastest way to grow." }], "style": "hero" },
+          "decoration": { "fontSize": "lg" }
+        },
+        {
+          "id": "c3", "gridArea": "3/1/4/2", "component": "QuoteBlock",
+          "props": { "text": "The world needs builders who understand real problems. That's you. Go build." },
+          "decoration": { "fontSize": "xl" }
+        }
       ],
       "speakerNotes": "End with energy.",
       "animations": "stagger",

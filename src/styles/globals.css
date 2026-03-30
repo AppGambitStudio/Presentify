@@ -23,14 +23,43 @@
   }
 }
 
+/* --- Slide Layout --- */
 .slide-content {
-  @apply max-w-7xl mx-auto px-12 h-full flex flex-col justify-center;
-  padding-top: 5rem;  /* clear the header */
-  padding-bottom: 5rem; /* clear the nav */
+  @apply max-w-7xl mx-auto h-full flex flex-col justify-center;
+  padding: 5rem 3rem;
 }
 
+@media (min-width: 768px) {
+  .slide-content { padding: 5rem 4rem; }
+}
+
+@media (min-width: 1280px) {
+  .slide-content { padding: 5rem 5rem; }
+}
+
+/* --- Glass Panel --- */
 .glass-panel {
   background: var(--slide-card-bg);
   border: 1px solid var(--slide-card-border);
-  @apply backdrop-blur-lg rounded-2xl p-8 relative overflow-hidden;
+  @apply backdrop-blur-lg rounded-2xl p-6 md:p-8 relative overflow-hidden;
+}
+
+.glass-panel.shadow-lg {
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.3),
+    0 0 1px var(--slide-card-border);
+}
+
+/* --- Shimmer effect for glass panels --- */
+.glass-panel::after {
+  content: "";
+  @apply absolute inset-0 -translate-x-full pointer-events-none;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.03), transparent);
+  animation: shimmer 10s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  15% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
 }

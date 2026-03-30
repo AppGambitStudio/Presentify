@@ -9,12 +9,13 @@ interface HeadingProps {
 
 export function Heading({ text, level = 1, align = "left", accentText }: HeadingProps) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
-  const sizeClass = level === 1 ? "text-5xl md:text-6xl" : level === 2 ? "text-3xl md:text-4xl" : "text-2xl";
+  // Default sizes as fallback -- can be overridden by CellDecoration.fontSize
+  const sizeClass = level === 1 ? "text-4xl md:text-5xl lg:text-6xl" : level === 2 ? "text-2xl md:text-3xl lg:text-4xl" : "text-xl md:text-2xl";
   const alignClass = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
 
   return (
     <Tag
-      className={`font-bold ${sizeClass} ${alignClass}`}
+      className={`font-bold leading-tight ${sizeClass} ${alignClass}`}
       style={{ fontFamily: "var(--slide-font-heading)" }}
     >
       {text}
