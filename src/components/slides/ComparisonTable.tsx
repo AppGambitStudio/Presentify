@@ -12,7 +12,7 @@ export function ComparisonTable({ headers, rows }: ComparisonTableProps) {
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="p-5 font-bold uppercase tracking-wider text-sm"
+                className="p-5 font-bold uppercase tracking-wider text-base"
                 style={{
                   fontFamily: "var(--slide-font-heading)",
                   color: i === headers.length - 1 ? "var(--slide-primary)" : "var(--slide-text-muted)",
@@ -29,7 +29,7 @@ export function ComparisonTable({ headers, rows }: ComparisonTableProps) {
               {row.map((cell, j) => (
                 <td
                   key={j}
-                  className="p-5 text-base"
+                  className="p-5 text-lg"
                   style={{
                     color: j === row.length - 1 ? "var(--slide-primary)" : "var(--slide-text-muted)",
                     fontWeight: j === row.length - 1 ? 700 : 400,

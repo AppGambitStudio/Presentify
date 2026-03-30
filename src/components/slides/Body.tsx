@@ -42,7 +42,7 @@ export function Body({ markdown }: BodyProps) {
   return (
     <div className="space-y-4" style={{ color: "var(--slide-text-muted)" }}>
       {paragraphs.map((para, i) => (
-        <p key={i} className="text-lg leading-relaxed">
+        <p key={i} className="text-xl leading-relaxed">
           {parseInlineMarkdown(para)}
         </p>
       ))}

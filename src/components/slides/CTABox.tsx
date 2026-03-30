@@ -13,7 +13,7 @@ export function CTABox({ text, color }: CTABoxProps) {
       {lines.map((line, i) => (
         <p
           key={i}
-          className={i === 0 ? "text-xl font-black" : "text-lg italic mt-2"}
+          className={i === 0 ? "text-2xl font-black" : "text-xl italic mt-2"}
           style={{
             color: "var(--slide-bg)",
             fontFamily: i === 0 ? "var(--slide-font-heading)" : undefined,

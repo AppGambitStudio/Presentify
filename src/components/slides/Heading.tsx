@@ -9,7 +9,7 @@ interface HeadingProps {
 
 export function Heading({ text, level = 1, align = "left", accentText }: HeadingProps) {
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
-  const sizeClass = level === 1 ? "text-4xl" : level === 2 ? "text-2xl" : "text-xl";
+  const sizeClass = level === 1 ? "text-5xl md:text-6xl" : level === 2 ? "text-3xl md:text-4xl" : "text-2xl";
   const alignClass = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
 
   return (

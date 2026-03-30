@@ -20,7 +20,7 @@ export function IconCard({ icon, title, desc, color }: IconCardProps) {
       <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${accentColor}20` }}>
         <Icon size={24} style={{ color: accentColor }} />
       </div>
-      <h3 className="text-lg font-bold" style={{ fontFamily: "var(--slide-font-heading)" }}>{title}</h3>
+      <h3 className="text-xl font-bold" style={{ fontFamily: "var(--slide-font-heading)" }}>{title}</h3>
       <p className="text-base" style={{ color: "var(--slide-text-muted)" }}>{desc}</p>
     </div>
   );

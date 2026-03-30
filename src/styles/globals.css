@@ -24,11 +24,13 @@
 }
 
 .slide-content {
-  @apply max-w-7xl mx-auto px-8 py-8 h-full flex flex-col justify-center;
+  @apply max-w-7xl mx-auto px-12 h-full flex flex-col justify-center;
+  padding-top: 5rem;  /* clear the header */
+  padding-bottom: 5rem; /* clear the nav */
 }
 
 .glass-panel {
   background: var(--slide-card-bg);
   border: 1px solid var(--slide-card-border);
-  @apply backdrop-blur-lg rounded-2xl p-6 relative overflow-hidden;
+  @apply backdrop-blur-lg rounded-2xl p-8 relative overflow-hidden;
 }

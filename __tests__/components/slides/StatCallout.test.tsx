@@ -11,6 +11,6 @@ describe("StatCallout", () => {
   test("value is displayed larger than label", () => {
     render(<StatCallout value="12" label="Certifications" />);
     const value = screen.getByText("12");
-    expect(value.className).toContain("text-5xl");
+    expect(value.className).toContain("text-6xl");
   });
 });

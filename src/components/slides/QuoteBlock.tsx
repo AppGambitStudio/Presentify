@@ -7,7 +7,7 @@ export function QuoteBlock({ text, attribution }: QuoteBlockProps) {
   return (
     <blockquote className="text-center py-4">
       <p
-        className="text-xl font-bold italic leading-relaxed"
+        className="text-2xl font-bold italic leading-relaxed"
         style={{ color: "var(--slide-primary)", fontFamily: "var(--slide-font-heading)" }}
       >
         &ldquo;{text}&rdquo;

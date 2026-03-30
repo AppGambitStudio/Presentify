@@ -23,13 +23,14 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
     <div className="slide-content">
       <div
         data-slide-grid
-        className="w-full h-full"
+        className="w-full flex-1"
         style={{
           display: "grid",
           gridTemplateColumns: slide.layout.columns,
           gridTemplateRows: slide.layout.rows,
           gap: slide.layout.gap,
           alignContent: "center",
+          alignItems: "center",
         }}
       >
         {slide.cells.map((cell) => (

@@ -8,7 +8,7 @@ export function StatCallout({ value, label, color }: StatCalloutProps) {
   return (
     <div className="text-center">
       <div
-        className="text-5xl font-black"
+        className="text-6xl md:text-7xl font-black"
         style={{ color: color || "var(--slide-primary)", fontFamily: "var(--slide-font-heading)" }}
       >
         {value}
