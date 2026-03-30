@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import type { Slide, Cell, CellDecoration, FontSize, TextAlign } from "@/lib/types";
 import { componentRegistry } from "@/components/slides";
 import * as LucideIcons from "lucide-react";
@@ -222,11 +223,39 @@ function CellRenderer({ cell }: { cell: Cell }) {
 }
 
 export function SlideRenderer({ slide }: SlideRendererProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  const [scale, setScale] = React.useState(1);
+
+  // Auto-scale: if grid content overflows its container, shrink to fit
+  React.useEffect(() => {
+    const container = containerRef.current;
+    const grid = gridRef.current;
+    if (!container || !grid) return;
+
+    const checkOverflow = () => {
+      const containerH = container.clientHeight;
+      const gridH = grid.scrollHeight;
+      if (gridH > containerH && containerH > 0) {
+        const newScale = Math.max(0.5, containerH / gridH);
+        setScale(newScale);
+      } else {
+        setScale(1);
+      }
+    };
+
+    // Check after render + fonts load
+    checkOverflow();
+    const timer = setTimeout(checkOverflow, 300);
+    return () => clearTimeout(timer);
+  }, [slide.id]);
+
   return (
-    <div className="slide-content">
+    <div ref={containerRef} className="slide-content">
       <div
+        ref={gridRef}
         data-slide-grid
-        className="w-full flex-1 overflow-hidden"
+        className="w-full origin-top"
         style={{
           display: "grid",
           gridTemplateColumns: slide.layout.columns,
@@ -234,6 +263,8 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
           gap: slide.layout.gap,
           alignContent: "center",
           alignItems: "center",
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          transformOrigin: "top center",
         }}
       >
         {slide.cells.map((cell) => (

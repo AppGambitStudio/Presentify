@@ -1,4 +1,5 @@
 import * as LucideIcons from "lucide-react";
+import { parseInlineMarkdown } from "@/lib/parseMarkdown";
 
 interface IconCardProps {
   icon: string;
@@ -21,7 +22,7 @@ export function IconCard({ icon, title, desc, color }: IconCardProps) {
         <Icon size={24} style={{ color: accentColor }} />
       </div>
       <h3 className="text-xl font-bold" style={{ fontFamily: "var(--slide-font-heading)" }}>{title}</h3>
-      <p className="text-base" style={{ color: "var(--slide-text-muted)" }} dangerouslySetInnerHTML={{ __html: desc.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>') }} />
+      <p className="text-base" style={{ color: "var(--slide-text-muted)" }}>{parseInlineMarkdown(desc)}</p>
     </div>
   );
 }

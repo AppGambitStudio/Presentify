@@ -1,4 +1,5 @@
 import * as LucideIcons from "lucide-react";
+import { parseInlineMarkdown } from "@/lib/parseMarkdown";
 
 interface BulletListProps {
   items: string[];
@@ -23,7 +24,7 @@ export function BulletList({ items, icon }: BulletListProps) {
           ) : (
             <span className="shrink-0 mt-2.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "var(--slide-primary)" }} />
           )}
-          <span>{item}</span>
+          <span>{parseInlineMarkdown(item)}</span>
         </li>
       ))}
     </ul>
