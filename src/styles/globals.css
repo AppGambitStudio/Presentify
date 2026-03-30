@@ -24,17 +24,17 @@
 
 /* --- Slide Layout --- */
 .slide-content {
-  @apply max-w-7xl mx-auto h-full flex flex-col justify-center;
-  padding: 4.5rem 3rem;
-  overflow: hidden; /* prevent content from spilling outside slide bounds */
+  @apply max-w-7xl mx-auto w-full h-full flex flex-col justify-center;
+  padding: 1.5rem 3rem;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
-  .slide-content { padding: 5rem 4rem; }
+  .slide-content { padding: 1.5rem 4rem; }
 }
 
 @media (min-width: 1280px) {
-  .slide-content { padding: 5rem 5rem; }
+  .slide-content { padding: 2rem 5rem; }
 }
 
 /* --- Glass Panel --- */

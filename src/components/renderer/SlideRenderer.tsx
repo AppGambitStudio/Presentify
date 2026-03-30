@@ -234,7 +234,6 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
           gap: slide.layout.gap,
           alignContent: "center",
           alignItems: "center",
-          maxHeight: "100%",
         }}
       >
         {slide.cells.map((cell) => (

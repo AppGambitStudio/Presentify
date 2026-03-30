@@ -63,13 +63,15 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
 
   return (
     <ThemeProvider theme={config.theme}>
-      <div className="relative w-screen h-screen overflow-hidden">
-        <header className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50">
+      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto" }}>
+        {/* Header -- row 1 */}
+        <header className="px-6 py-4 flex justify-between items-center z-50">
           <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>
           <span className="text-sm" style={{ color: "var(--slide-text-muted)" }}>{currentSlide + 1} / {totalSlides}</span>
         </header>
 
-        <main className="relative w-full h-full">
+        {/* Slide content -- row 2 (takes all remaining space) */}
+        <main className="relative overflow-hidden">
           <AnimatePresence custom={direction}>
             <motion.div
               key={currentSlide}
@@ -91,7 +93,8 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
           </AnimatePresence>
         </main>
 
-        <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
+        {/* Navigation -- row 3 */}
+        <nav className="flex justify-center items-center gap-4 py-3 z-50">
           <button onClick={prevSlide} disabled={currentSlide === 0} className="p-3 rounded-full disabled:opacity-20 transition-all" style={{ backgroundColor: "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)" }}>
             <ChevronLeft size={20} />
           </button>
@@ -107,6 +110,7 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
           </button>
         </nav>
 
+        {/* Progress bar -- row 4 */}
         <ProgressBar current={currentSlide} total={totalSlides} />
       </div>
     </ThemeProvider>
