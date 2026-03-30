@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 interface HeadingProps {
   text: string;
   level?: 1 | 2 | 3;
