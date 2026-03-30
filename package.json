@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "clsx": "^2.1.1",
     "lucide-react": "^1.7.0",
     "motion": "^12.38.0",
