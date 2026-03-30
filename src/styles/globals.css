@@ -25,7 +25,8 @@
 /* --- Slide Layout --- */
 .slide-content {
   @apply max-w-7xl mx-auto h-full flex flex-col justify-center;
-  padding: 5rem 3rem;
+  padding: 4.5rem 3rem;
+  overflow: hidden; /* prevent content from spilling outside slide bounds */
 }
 
 @media (min-width: 768px) {

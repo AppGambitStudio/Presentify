@@ -102,29 +102,59 @@ function buildVariantStyles(decoration: CellDecoration): { className: string; st
   return { className, style };
 }
 
+// Check if an object looks like a nested cell/component definition
+function isNestedComponent(obj: any): boolean {
+  return obj && typeof obj === "object" && !Array.isArray(obj) && typeof obj.component === "string";
+}
+
 // Recursively render a nested cell object into a React element
 function renderNestedCell(obj: any): React.ReactNode {
   if (!obj || typeof obj !== "object") return obj;
-  if (obj.component && obj.props && componentRegistry[obj.component as keyof typeof componentRegistry]) {
-    const NestedComponent = componentRegistry[obj.component as keyof typeof componentRegistry];
-    const cleanProps = sanitizeProps(obj.props);
-    return <NestedComponent {...cleanProps} />;
+  if (isNestedComponent(obj)) {
+    const Comp = componentRegistry[obj.component as keyof typeof componentRegistry];
+    if (Comp) {
+      const cleanProps = sanitizeProps(obj.props || {});
+      // Also handle "children" if present
+      if (obj.children) {
+        const childContent = typeof obj.children === "string"
+          ? obj.children
+          : isNestedComponent(obj.children)
+            ? renderNestedCell(obj.children)
+            : Array.isArray(obj.children)
+              ? obj.children.map((c: any, i: number) => isNestedComponent(c) ? <span key={i}>{renderNestedCell(c)}</span> : c)
+              : String(obj.children);
+        return <Comp {...cleanProps}>{childContent}</Comp>;
+      }
+      return <Comp {...cleanProps} />;
+    }
   }
-  return null;
+  // If it's a plain object but not a component, convert to string to prevent React error
+  return JSON.stringify(obj);
 }
 
-// Clean props: if a prop value looks like a nested cell, render it; filter out raw objects
+// Clean props: if a prop value looks like a nested cell, render it; filter out raw objects that would crash React
 function sanitizeProps(props: Record<string, any>): Record<string, any> {
   const clean: Record<string, any> = {};
   for (const [key, value] of Object.entries(props)) {
-    if (value && typeof value === "object" && !Array.isArray(value) && value.component && value.props) {
+    if (value === null || value === undefined) {
+      clean[key] = value;
+    } else if (isNestedComponent(value)) {
       clean[key] = renderNestedCell(value);
     } else if (Array.isArray(value)) {
-      clean[key] = value.map((item) =>
-        item && typeof item === "object" && item.component && item.props
-          ? renderNestedCell(item)
-          : item
+      clean[key] = value.map((item, i) =>
+        isNestedComponent(item) ? renderNestedCell(item) : item
       );
+    } else if (typeof value === "object" && !(value instanceof Date)) {
+      // Plain objects that aren't component defs -- check if they have only primitive values
+      const hasOnlyPrimitives = Object.values(value).every(
+        (v) => v === null || v === undefined || typeof v !== "object"
+      );
+      if (hasOnlyPrimitives) {
+        clean[key] = value; // safe to pass (e.g. style objects)
+      } else {
+        // Deep object -- try to sanitize recursively
+        clean[key] = sanitizeProps(value);
+      }
     } else {
       clean[key] = value;
     }
@@ -196,7 +226,7 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
     <div className="slide-content">
       <div
         data-slide-grid
-        className="w-full flex-1"
+        className="w-full flex-1 overflow-hidden"
         style={{
           display: "grid",
           gridTemplateColumns: slide.layout.columns,
@@ -204,6 +234,7 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
           gap: slide.layout.gap,
           alignContent: "center",
           alignItems: "center",
+          maxHeight: "100%",
         }}
       >
         {slide.cells.map((cell) => (
