@@ -102,6 +102,36 @@ function buildVariantStyles(decoration: CellDecoration): { className: string; st
   return { className, style };
 }
 
+// Recursively render a nested cell object into a React element
+function renderNestedCell(obj: any): React.ReactNode {
+  if (!obj || typeof obj !== "object") return obj;
+  if (obj.component && obj.props && componentRegistry[obj.component as keyof typeof componentRegistry]) {
+    const NestedComponent = componentRegistry[obj.component as keyof typeof componentRegistry];
+    const cleanProps = sanitizeProps(obj.props);
+    return <NestedComponent {...cleanProps} />;
+  }
+  return null;
+}
+
+// Clean props: if a prop value looks like a nested cell, render it; filter out raw objects
+function sanitizeProps(props: Record<string, any>): Record<string, any> {
+  const clean: Record<string, any> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (value && typeof value === "object" && !Array.isArray(value) && value.component && value.props) {
+      clean[key] = renderNestedCell(value);
+    } else if (Array.isArray(value)) {
+      clean[key] = value.map((item) =>
+        item && typeof item === "object" && item.component && item.props
+          ? renderNestedCell(item)
+          : item
+      );
+    } else {
+      clean[key] = value;
+    }
+  }
+  return clean;
+}
+
 function CellRenderer({ cell }: { cell: Cell }) {
   const Component = componentRegistry[cell.component];
   if (!Component) {
@@ -155,7 +185,7 @@ function CellRenderer({ cell }: { cell: Cell }) {
       )}
       {/* Component content */}
       <div className="relative z-10">
-        <Component {...cell.props} />
+        <Component {...sanitizeProps(cell.props)} />
       </div>
     </Wrapper>
   );

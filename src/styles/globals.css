@@ -19,7 +19,6 @@
     font-family: var(--slide-font-body);
     background: var(--slide-bg);
     color: var(--slide-text);
-    overflow: hidden;
   }
 }
 

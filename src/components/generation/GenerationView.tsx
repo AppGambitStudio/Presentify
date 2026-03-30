@@ -97,7 +97,7 @@ export function GenerationView() {
   }, [intake, handleIntakeSubmit]);
 
   return (
-    <div className="min-h-screen flex flex-col justify-center px-6 py-16" style={{ backgroundColor: "var(--slide-bg)" }}>
+    <div className="min-h-screen px-6 py-16 overflow-y-auto" style={{ backgroundColor: "var(--slide-bg)" }}>
       {error && (
         <div className="max-w-3xl mx-auto mb-8 p-4 rounded-xl text-center" style={{ backgroundColor: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#ef4444" }}>
           {error}

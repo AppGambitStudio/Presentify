@@ -7,7 +7,7 @@ Each slide is a CSS grid of cells. Each cell has a \`component\` type and \`prop
 
 | Component | Props | Use For |
 |-----------|-------|---------|
-| Heading | text, level (1/2/3), align (left/center/right), accentText? | Slide titles, section headers |
+| Heading | text, level (1/2/3), align (left/center/right), accentText? | Slide titles. IMPORTANT: text is the FULL title, accentText highlights a PORTION of it. Example: text="Building in the Age of AI", accentText="Age of AI" -- the component auto-deduplicates. Do NOT put the full text in both fields. |
 | Body | markdown (supports **bold**, *italic*, \\\`code\\\`) | Paragraphs, descriptions |
 | BulletList | items[], icon? (lucide name e.g. "check-circle", "zap") | Lists of points |
 | NumberedSteps | steps[{title, desc}], style? ("compact"/"hero") | Step-by-step processes |
