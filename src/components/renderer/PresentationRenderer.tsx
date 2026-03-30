@@ -1,8 +1,9 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight, Maximize, Minimize } from "lucide-react";
-import type { PresentationConfig } from "@/lib/types";
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2 } from "lucide-react";
+import type { PresentationConfig, Slide } from "@/lib/types";
+import { SlideEditor } from "./SlideEditor";
 import { ThemeProvider } from "./ThemeProvider";
 import { SlideRenderer } from "./SlideRenderer";
 import { SlideDecorations } from "./SlideDecorations";
@@ -30,10 +31,12 @@ const slideVariants = {
 
 interface PresentationRendererProps { config: PresentationConfig; }
 
-export function PresentationRenderer({ config }: PresentationRendererProps) {
+export function PresentationRenderer({ config: initialConfig }: PresentationRendererProps) {
+  const [config, setConfig] = useState(initialConfig);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const totalSlides = config.slides.length;
 
   const nextSlide = useCallback(() => {
@@ -49,28 +52,40 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
     else { document.exitFullscreen(); setIsFullscreen(false); }
   }, []);
 
+  const toggleEditor = useCallback(() => setShowEditor((v) => !v), []);
+
+  const handleSlideUpdate = useCallback((updated: Slide) => {
+    setConfig((prev) => ({
+      ...prev,
+      slides: prev.slides.map((s) => (s.id === updated.id ? updated : s)),
+    }));
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't capture keys when editor textarea is focused
+      if (showEditor && (e.target as HTMLElement)?.tagName === "TEXTAREA") return;
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") nextSlide();
       if (e.key === "ArrowLeft" || e.key === "PageUp") prevSlide();
       if (e.key === "f") toggleFullscreen();
+      if (e.key === "e") toggleEditor();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nextSlide, prevSlide, toggleFullscreen]);
+  }, [nextSlide, prevSlide, toggleFullscreen, toggleEditor, showEditor]);
 
   const slide = config.slides[currentSlide];
 
   return (
     <ThemeProvider theme={config.theme}>
-      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto" }}>
+      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "1fr 420px" : "1fr" }}>
         {/* Header -- row 1 */}
-        <header className="px-6 py-4 flex justify-between items-center z-50">
+        <header className="px-6 py-4 flex justify-between items-center z-50" style={{ gridColumn: "1 / -1" }}>
           <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>
           <span className="text-sm" style={{ color: "var(--slide-text-muted)" }}>{currentSlide + 1} / {totalSlides}</span>
         </header>
 
-        {/* Slide content -- row 2 (takes all remaining space) */}
+        {/* Slide content -- row 2 */}
         <main className="relative overflow-hidden">
           <AnimatePresence custom={direction}>
             <motion.div
@@ -93,6 +108,13 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
           </AnimatePresence>
         </main>
 
+        {/* Editor panel -- row 2, column 2 (only when open) */}
+        {showEditor && (
+          <div className="overflow-hidden" style={{ gridRow: "2 / 4", borderLeft: "1px solid var(--slide-card-border)", backgroundColor: "var(--slide-bg)" }}>
+            <SlideEditor slide={slide} onSave={handleSlideUpdate} />
+          </div>
+        )}
+
         {/* Navigation -- row 3 */}
         <nav className="flex justify-center items-center gap-4 py-3 z-50">
           <button onClick={prevSlide} disabled={currentSlide === 0} className="p-3 rounded-full disabled:opacity-20 transition-all" style={{ backgroundColor: "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)" }}>
@@ -107,6 +129,9 @@ export function PresentationRenderer({ config }: PresentationRendererProps) {
           <div className="w-px h-6 mx-2" style={{ backgroundColor: "var(--slide-card-border)" }} />
           <button onClick={toggleFullscreen} className="p-3 rounded-full transition-all" style={{ backgroundColor: "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)" }}>
             {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+          </button>
+          <button onClick={toggleEditor} className="p-3 rounded-full transition-all" style={{ backgroundColor: showEditor ? "var(--slide-primary)" : "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)", color: showEditor ? "var(--slide-bg)" : "var(--slide-text)" }} title="Toggle JSON Editor (E)">
+            <Code2 size={20} />
           </button>
         </nav>
 
