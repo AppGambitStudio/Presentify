@@ -118,3 +118,42 @@ export interface PresentationConfig {
   theme: ThemeConfig;
   slides: Slide[];
 }
+
+// --- Intake Form ---
+export interface IntakeFormData {
+  title: string;
+  speakerName: string;
+  speakerRole: string;
+  speakerOrganization: string;
+  audience: string;
+  purpose: string;
+  duration: 10 | 15 | 20 | 25 | 30;
+  tone: string[];
+  keyPoints: string;
+  dos: string;
+  donts: string;
+  primaryColor: string;
+  accentColor: string;
+}
+
+export interface OutlineItem {
+  number: number;
+  summary: string;
+}
+
+export type GenerationPhase =
+  | "idle"
+  | "generating-outline"
+  | "outline-ready"
+  | "generating-slides"
+  | "complete"
+  | "error";
+
+export interface GenerationState {
+  phase: GenerationPhase;
+  outline: OutlineItem[];
+  slidesCompleted: number;
+  totalSlides: number;
+  currentConfig: PresentationConfig | null;
+  error: string | null;
+}
