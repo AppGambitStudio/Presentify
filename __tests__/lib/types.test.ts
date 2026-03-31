@@ -1,8 +1,7 @@
 import type {
   PresentationConfig,
   Slide,
-  Cell,
-  GridLayout,
+  Section,
   ThemeConfig,
   ComponentType,
 } from "@/lib/types";

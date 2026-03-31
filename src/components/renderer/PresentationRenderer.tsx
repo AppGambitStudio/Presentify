@@ -78,15 +78,15 @@ export function PresentationRenderer({ config: initialConfig }: PresentationRend
 
   return (
     <ThemeProvider theme={config.theme}>
-      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "1fr 420px" : "1fr" }}>
+      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "60fr 40fr" : "1fr" }}>
         {/* Header -- row 1 */}
         <header className="px-6 py-4 flex justify-between items-center z-50" style={{ gridColumn: "1 / -1" }}>
           <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>
           <span className="text-sm" style={{ color: "var(--slide-text-muted)" }}>{currentSlide + 1} / {totalSlides}</span>
         </header>
 
-        {/* Slide content -- row 2 */}
-        <main className="relative overflow-hidden">
+        {/* Slide content -- row 2, column 1 */}
+        <main className="relative overflow-hidden" style={{ gridColumn: "1" }}>
           <AnimatePresence custom={direction}>
             <motion.div
               key={currentSlide}
@@ -108,9 +108,9 @@ export function PresentationRenderer({ config: initialConfig }: PresentationRend
           </AnimatePresence>
         </main>
 
-        {/* Editor panel -- row 2, column 2 (only when open) */}
+        {/* Editor panel -- row 2, explicitly column 2 (only when open) */}
         {showEditor && (
-          <div className="overflow-hidden" style={{ gridRow: "2 / 4", borderLeft: "1px solid var(--slide-card-border)", backgroundColor: "var(--slide-bg)" }}>
+          <div className="overflow-hidden" style={{ gridRow: "2 / 4", gridColumn: "2", borderLeft: "1px solid var(--slide-card-border)", backgroundColor: "var(--slide-bg)" }}>
             <SlideEditor slide={slide} onSave={handleSlideUpdate} />
           </div>
         )}

@@ -48,33 +48,33 @@ Always respond with ONLY valid JSON, no markdown formatting or explanation.`;
 
 export function buildSonnetSlidePrompt(themeJson: string): string {
   return (
-    `You are an expert presentation content designer. Given a slide summary and theme, generate the full slide content.\n\n` +
+    `You are an expert presentation content designer. Given a slide summary and theme, generate the slide content.\n\n` +
     COMPONENT_REFERENCE +
     `\nCurrent theme:\n` +
     themeJson +
     `\n\nGenerate a slide as a JSON object:
 {
-  "layout": { "columns": "...", "rows": "...", "gap": "..." },
-  "cells": [
-    {
-      "id": "c1",
-      "gridArea": "row-start/col-start/row-end/col-end",
-      "component": "ComponentName",
-      "props": { ... },
-      "decoration": { ... }
-    }
+  "title": "Slide Title",
+  "titleAccent": "highlighted portion of title",
+  "subtitle": "optional subtitle",
+  "sections": [
+    { "type": "full", "component": "ComponentName", "props": { ... } },
+    { "type": "columns", "columns": [
+      { "component": "ComponentName", "props": { ... } },
+      { "component": "ComponentName", "props": { ... } }
+    ] }
   ],
-  "speakerNotes": "...",
-  "animations": "fade|slide-left|slide-right|scale|stagger",
+  "speakerNotes": "brief delivery hint",
   "decorations": []
 }
 
-Guidelines:
-- Make content engaging, concise, and presentation-ready
-- Use the component library creatively
-- Always include CellDecoration with appropriate fontSize
-- Match visual style to the theme
-- Speaker notes should be brief delivery hints
+Rules:
+- Keep content concise -- this is a presentation, not an essay
+- 2-4 sections max per slide
+- BulletList items under 10 words each
+- Use "columns" for side-by-side comparisons (2-3 columns max)
+- Don't use Heading component -- the title field handles headings
+- titleAccent must be a substring that appears at the END of title
 
 Always respond with ONLY valid JSON, no markdown formatting or explanation.`
   );

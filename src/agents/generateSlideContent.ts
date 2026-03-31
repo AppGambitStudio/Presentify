@@ -25,7 +25,7 @@ export async function generateSlideContent(
   ].join("\n");
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
+    max_tokens: 2048,
     system: buildSonnetSlidePrompt(themeJson),
     messages: [{ role: "user", content: userMessage }],
   });
@@ -35,10 +35,11 @@ export async function generateSlideContent(
   return {
     number: outlineItem.number,
     summary: outlineItem.summary,
-    layout: slideData.layout,
-    cells: slideData.cells,
+    title: slideData.title || outlineItem.summary,
+    titleAccent: slideData.titleAccent,
+    subtitle: slideData.subtitle,
+    sections: slideData.sections || [],
     speakerNotes: slideData.speakerNotes || "",
-    animations: slideData.animations || "fade",
     decorations: slideData.decorations || [],
   };
 }

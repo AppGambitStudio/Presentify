@@ -1,274 +1,94 @@
 "use client";
 
 import React from "react";
-import type { Slide, Cell, CellDecoration, FontSize, TextAlign } from "@/lib/types";
+import type { Slide, Section, ComponentType } from "@/lib/types";
 import { componentRegistry } from "@/components/slides";
-import * as LucideIcons from "lucide-react";
-import { motion } from "motion/react";
 
 interface SlideRendererProps {
   slide: Slide;
 }
 
-// --- Font size map: config value -> responsive CSS classes ---
-const fontSizeMap: Record<FontSize, string> = {
-  sm: "text-sm md:text-base",
-  base: "text-base md:text-lg",
-  lg: "text-lg md:text-xl",
-  xl: "text-xl md:text-2xl",
-  "2xl": "text-2xl md:text-3xl",
-  "3xl": "text-3xl md:text-4xl",
-  "4xl": "text-4xl md:text-5xl",
-  "5xl": "text-5xl md:text-6xl",
-  "6xl": "text-6xl md:text-7xl",
-  "7xl": "text-7xl md:text-8xl",
-  "8xl": "text-8xl md:text-9xl",
-};
-
-const alignMap: Record<TextAlign, string> = {
-  left: "text-left",
-  center: "text-center",
-  right: "text-right",
-};
-
-const fontWeightMap: Record<string, string> = {
-  normal: "font-normal",
-  medium: "font-medium",
-  semibold: "font-semibold",
-  bold: "font-bold",
-  extrabold: "font-extrabold",
-  black: "font-black",
-};
-
-const animateMap: Record<string, object> = {
-  "fade-in": { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.6 } },
-  "slide-up": { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5 } },
-  "scale": { initial: { opacity: 0, scale: 0.9 }, animate: { opacity: 1, scale: 1 }, transition: { duration: 0.5 } },
-};
-
-function getIcon(name: string) {
-  const formatted = name.replace(/-./g, (m) => m[1].toUpperCase()).replace(/^./, (m) => m.toUpperCase());
-  return (LucideIcons as any)[formatted] || null;
-}
-
-function buildVariantStyles(decoration: CellDecoration): { className: string; style: React.CSSProperties } {
-  const variant = decoration.variant || "default";
-  let className = "";
-  const style: React.CSSProperties = {};
-
-  switch (variant) {
-    case "elevated":
-      className = "glass-panel shadow-lg";
-      break;
-    case "outlined":
-      className = "rounded-2xl";
-      style.border = `1px solid var(--slide-card-border)`;
-      style.padding = decoration.padding || "1.5rem";
-      break;
-    case "filled":
-      className = "rounded-2xl";
-      style.backgroundColor = decoration.background || "var(--slide-card-bg)";
-      style.padding = decoration.padding || "1.5rem";
-      break;
-    case "ghost":
-      // No visual treatment, just a container
-      break;
-    default:
-      break;
-  }
-
-  if (decoration.borderAccent) {
-    style.borderLeft = `4px solid ${decoration.borderAccent}`;
-    if (variant === "default") {
-      style.paddingLeft = "1.5rem";
-    }
-  }
-
-  if (decoration.background && variant !== "filled") {
-    style.background = decoration.background;
-  }
-
-  if (decoration.rounded) {
-    style.borderRadius = decoration.rounded;
-  }
-
-  if (decoration.padding) {
-    style.padding = decoration.padding;
-  }
-
-  if (decoration.glow) {
-    style.boxShadow = `0 0 30px ${decoration.borderAccent || "var(--slide-primary)"}30`;
-  }
-
-  return { className, style };
-}
-
-// Check if an object looks like a nested cell/component definition
-function isNestedComponent(obj: any): boolean {
-  return obj && typeof obj === "object" && !Array.isArray(obj) && typeof obj.component === "string";
-}
-
-// Recursively render a nested cell object into a React element
-function renderNestedCell(obj: any): React.ReactNode {
-  if (!obj || typeof obj !== "object") return obj;
-  if (isNestedComponent(obj)) {
-    const Comp = componentRegistry[obj.component as keyof typeof componentRegistry];
-    if (Comp) {
-      const cleanProps = sanitizeProps(obj.props || {});
-      // Also handle "children" if present
-      if (obj.children) {
-        const childContent = typeof obj.children === "string"
-          ? obj.children
-          : isNestedComponent(obj.children)
-            ? renderNestedCell(obj.children)
-            : Array.isArray(obj.children)
-              ? obj.children.map((c: any, i: number) => isNestedComponent(c) ? <span key={i}>{renderNestedCell(c)}</span> : c)
-              : String(obj.children);
-        return <Comp {...cleanProps}>{childContent}</Comp>;
-      }
-      return <Comp {...cleanProps} />;
-    }
-  }
-  // If it's a plain object but not a component, convert to string to prevent React error
-  return JSON.stringify(obj);
-}
-
-// Clean props: if a prop value looks like a nested cell, render it; filter out raw objects that would crash React
-function sanitizeProps(props: Record<string, any>): Record<string, any> {
-  const clean: Record<string, any> = {};
-  for (const [key, value] of Object.entries(props)) {
-    if (value === null || value === undefined) {
-      clean[key] = value;
-    } else if (isNestedComponent(value)) {
-      clean[key] = renderNestedCell(value);
-    } else if (Array.isArray(value)) {
-      clean[key] = value.map((item, i) =>
-        isNestedComponent(item) ? renderNestedCell(item) : item
-      );
-    } else if (typeof value === "object" && !(value instanceof Date)) {
-      // Plain objects that aren't component defs -- check if they have only primitive values
-      const hasOnlyPrimitives = Object.values(value).every(
-        (v) => v === null || v === undefined || typeof v !== "object"
-      );
-      if (hasOnlyPrimitives) {
-        clean[key] = value; // safe to pass (e.g. style objects)
-      } else {
-        // Deep object -- try to sanitize recursively
-        clean[key] = sanitizeProps(value);
-      }
-    } else {
-      clean[key] = value;
-    }
-  }
-  return clean;
-}
-
-function CellRenderer({ cell }: { cell: Cell }) {
-  const Component = componentRegistry[cell.component];
+function renderComponent(component: ComponentType, props: Record<string, any>) {
+  const Component = componentRegistry[component];
   if (!Component) {
-    console.warn(`Unknown component type: ${cell.component}`);
+    console.warn(`Unknown component: ${component}`);
     return null;
   }
+  // Sanitize: if any prop value is an object with "component", skip it (AI artifact)
+  const clean: Record<string, any> = {};
+  for (const [k, v] of Object.entries(props)) {
+    if (v && typeof v === "object" && !Array.isArray(v) && v.component) {
+      continue; // skip nested component objects
+    }
+    clean[k] = v;
+  }
+  return <Component {...clean} />;
+}
 
-  const dec = cell.decoration || {};
-  const { className: variantClass, style: variantStyle } = buildVariantStyles(dec);
-
-  // Build typography classes
-  const typoClasses = [
-    dec.fontSize ? fontSizeMap[dec.fontSize] : "",
-    dec.align ? alignMap[dec.align] : "",
-    dec.fontWeight ? fontWeightMap[dec.fontWeight] : "",
-  ].filter(Boolean).join(" ");
-
-  // Build typography styles
-  const typoStyle: React.CSSProperties = {};
-  if (dec.textColor) typoStyle.color = dec.textColor;
-
-  // Merge all styles
-  const mergedStyle: React.CSSProperties = {
-    gridArea: cell.gridArea,
-    ...variantStyle,
-    ...typoStyle,
-  };
-
-  const mergedClass = [variantClass, typoClasses].filter(Boolean).join(" ");
-
-  // Decorative background icon
-  const BgIcon = dec.icon ? getIcon(dec.icon) : null;
-
-  // Wrap in motion.div if animation is set
-  const animate = dec.animate && dec.animate !== "none" ? animateMap[dec.animate] : null;
-  const Wrapper = animate ? motion.div : "div";
-  const wrapperProps = animate || {};
-
-  return (
-    <Wrapper
-      data-cell-id={cell.id}
-      className={`relative overflow-hidden ${mergedClass}`}
-      style={mergedStyle}
-      {...(wrapperProps as any)}
-    >
-      {/* Decorative background icon */}
-      {BgIcon && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.04]">
-          <BgIcon size={200} />
-        </div>
-      )}
-      {/* Component content */}
-      <div className="relative z-10">
-        <Component {...sanitizeProps(cell.props)} />
+function SectionRenderer({ section }: { section: Section }) {
+  if (section.type === "full") {
+    return (
+      <div className="w-full">
+        {renderComponent(section.component, section.props)}
       </div>
-    </Wrapper>
-  );
+    );
+  }
+
+  if (section.type === "columns") {
+    const colCount = section.columns.length;
+    return (
+      <div
+        className="w-full gap-6 md:gap-8"
+        style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+      >
+        {section.columns.map((col, i) => (
+          <div key={i}>
+            {renderComponent(col.component, col.props)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export function SlideRenderer({ slide }: SlideRendererProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const gridRef = React.useRef<HTMLDivElement>(null);
-  const [scale, setScale] = React.useState(1);
-
-  // Auto-scale: if grid content overflows its container, shrink to fit
-  React.useEffect(() => {
-    const container = containerRef.current;
-    const grid = gridRef.current;
-    if (!container || !grid) return;
-
-    const checkOverflow = () => {
-      const containerH = container.clientHeight;
-      const gridH = grid.scrollHeight;
-      if (gridH > containerH && containerH > 0) {
-        const newScale = Math.max(0.5, containerH / gridH);
-        setScale(newScale);
-      } else {
-        setScale(1);
-      }
-    };
-
-    // Check after render + fonts load
-    checkOverflow();
-    const timer = setTimeout(checkOverflow, 300);
-    return () => clearTimeout(timer);
-  }, [slide.id]);
+  // Strip duplicate accent text from title
+  let displayTitle = slide.title;
+  if (slide.titleAccent) {
+    const idx = displayTitle.lastIndexOf(slide.titleAccent);
+    if (idx >= 0 && idx + slide.titleAccent.length === displayTitle.length) {
+      displayTitle = displayTitle.slice(0, idx);
+    }
+  }
 
   return (
-    <div ref={containerRef} className="slide-content">
-      <div
-        ref={gridRef}
-        data-slide-grid
-        className="w-full origin-top"
-        style={{
-          display: "grid",
-          gridTemplateColumns: slide.layout.columns,
-          gridTemplateRows: slide.layout.rows,
-          gap: slide.layout.gap,
-          alignContent: "center",
-          alignItems: "center",
-          transform: scale < 1 ? `scale(${scale})` : undefined,
-          transformOrigin: "top center",
-        }}
-      >
-        {slide.cells.map((cell) => (
-          <CellRenderer key={cell.id} cell={cell} />
+    <div className="slide-content">
+      <div className="w-full flex-1 flex flex-col justify-center gap-6 overflow-hidden">
+        {/* Title area */}
+        {slide.title && (
+          <div className="text-center">
+            <h1
+              className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight"
+              style={{ fontFamily: "var(--slide-font-heading)" }}
+            >
+              {displayTitle}
+              {slide.titleAccent && (
+                <span style={{ color: "var(--slide-primary)" }}>{slide.titleAccent}</span>
+              )}
+            </h1>
+            {slide.subtitle && (
+              <p className="mt-3 text-lg md:text-xl" style={{ color: "var(--slide-text-muted)" }}>
+                {slide.subtitle}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Sections */}
+        {slide.sections.map((section, i) => (
+          <SectionRenderer key={i} section={section} />
         ))}
       </div>
     </div>

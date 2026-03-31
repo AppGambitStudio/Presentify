@@ -15,8 +15,8 @@ const sampleConfig: PresentationConfig = {
     style: "glass-morphism", darkMode: true,
   },
   slides: [
-    { id: "s1", number: 1, summary: "First", layout: { columns: "1fr", rows: "auto", gap: "1rem" }, cells: [{ id: "c1", gridArea: "1/1/2/2", component: "Heading", props: { text: "Slide One", level: 1 } }], speakerNotes: "", animations: "fade", decorations: [] },
-    { id: "s2", number: 2, summary: "Second", layout: { columns: "1fr", rows: "auto", gap: "1rem" }, cells: [{ id: "c2", gridArea: "1/1/2/2", component: "Heading", props: { text: "Slide Two", level: 1 } }], speakerNotes: "", animations: "fade", decorations: [] },
+    { id: "s1", number: 1, summary: "First", title: "Slide One", sections: [], speakerNotes: "", decorations: [] },
+    { id: "s2", number: 2, summary: "Second", title: "Slide Two", sections: [], speakerNotes: "", decorations: [] },
   ],
 };
 
