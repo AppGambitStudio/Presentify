@@ -6,7 +6,7 @@ import { PresentationRenderer } from "@/components/renderer/PresentationRenderer
 import { ChatPanel } from "@/components/workspace/ChatPanel";
 import type { PresentationConfig } from "@/lib/types";
 import { getPresentation, savePresentation } from "@/lib/store";
-import { Presentation, PenLine } from "lucide-react";
+import { Presentation, PenLine, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import sampleData from "@/lib/sample-presentation.json";
 
@@ -84,13 +84,23 @@ export default function WorkspacePage() {
             Workspace
           </span>
         </div>
-        <Link
-          href={`/p/${id}/present`}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-transform hover:scale-105"
-          style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}
-        >
-          <Presentation size={14} /> Present
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/help"
+            target="_blank"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors"
+            style={{ color: "var(--slide-text-muted)", border: "1px solid var(--slide-card-border)" }}
+          >
+            <HelpCircle size={14} /> Docs
+          </Link>
+          <Link
+            href={`/p/${id}/present`}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-transform hover:scale-105"
+            style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}
+          >
+            <Presentation size={14} /> Present
+          </Link>
+        </div>
       </div>
 
       {/* Preview -- row 2, col 1 */}
