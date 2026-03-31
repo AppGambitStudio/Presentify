@@ -2,6 +2,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { PresentationRenderer } from "@/components/renderer/PresentationRenderer";
 import type { PresentationConfig } from "@/lib/types";
 
+// Mock Next.js navigation
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+  usePathname: () => "/p/test/present",
+}));
+
 const sampleConfig: PresentationConfig = {
   id: "test", createdAt: "2026-01-01", lastModified: "2026-01-01",
   title: "Test Presentation",

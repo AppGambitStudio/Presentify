@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Presentify
 
-## Getting Started
+Open-source AI-powered presentation builder. Describe your talk, AI generates beautiful animated slides. Edit with chat or click.
 
-First, run the development server:
+## Quick Start
 
 ```bash
+npm install
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What It Does
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Describe your talk** — 4-step form: topic, audience, tone, duration
+2. **AI plans the structure** — Claude Opus generates an outline you can review/edit
+3. **AI creates slides** — Claude Sonnet generates each slide with components and styling
+4. **Edit 3 ways** — Chat ("make S2 more concise"), click-to-edit text, or raw JSON editor
+5. **Present** — Full-screen animated presentation with keyboard navigation
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js** (App Router) + **TypeScript**
+- **Anthropic Claude** — Opus for planning, Sonnet for content generation and editing
+- **Tailwind CSS v4** + **Motion/React** (spring animations)
+- **Lucide React** (icons) + **Recharts** (charts) + **react-qr-code**
+- **localStorage** for persistence (no database)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Route | What |
+|-------|------|
+| `/` | Landing page |
+| `/create` | Intake form → outline approval → AI generation |
+| `/p/[id]` | Workspace: preview + chat editing + section IDs |
+| `/p/[id]/present` | Full-screen presentation mode |
+| `/p/sample/present` | Built-in sample presentation |
 
-## Deploy on Vercel
+## Keyboard Shortcuts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Key | Action |
+|-----|--------|
+| `→` / `Space` | Next slide |
+| `←` | Previous slide |
+| `F` | Fullscreen |
+| `E` | JSON editor |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Slide Data Model
+
+Each slide is ~15 lines of JSON:
+
+```json
+{
+  "title": "AI is Your Superpower",
+  "titleAccent": "Superpower",
+  "sections": [
+    {
+      "type": "columns",
+      "columns": [
+        { "component": "BulletList", "props": { "items": ["Write S3 policies", "Scaffold CDK"], "icon": "check-circle" } },
+        { "component": "IconCard", "props": { "title": "Ship Fast", "desc": "Days not months", "layout": "horizontal" } }
+      ],
+      "style": { "fontSize": "110%" }
+    }
+  ]
+}
+```
+
+### 20 Components
+
+Body, BulletList, NumberedSteps, ComparisonTable, StatCallout, QuoteBlock, IconCard, CardGrid, CTABox, CodeBlock, ChartBlock, ImageBlock, TagList, ShowcaseCard, HeroIcon, PromptBlock, Divider, Spacer, Heading, TwoColumn
+
+### Section Styles
+
+```json
+"style": { "align": "center", "fontSize": "125%", "glass": true, "accent": "#FF9900" }
+```
+
+Per-column styles also supported.
+
+## Project Structure
+
+```
+src/
+  app/           # Next.js routes + API
+  agents/        # Claude AI agents (outline, theme, slides, edit)
+  components/
+    slides/      # 20 slide components
+    renderer/    # SlideRenderer, PresentationRenderer, ThemeProvider
+    workspace/   # ChatPanel
+    intake/      # IntakeWizard
+  lib/           # Types, store, icon resolver, markdown parser
+  styles/        # Global CSS + theme variables
+```
+
+## Roadmap
+
+- [ ] Export as standalone HTML
+- [ ] Export as downloadable project
+- [ ] MCP integration (web search, images)
+- [ ] Drag-to-reorder slides
+- [ ] Dark/light toggle
+
+## Deploy
+
+Works on Vercel, Netlify, or any Node.js host. Set `ANTHROPIC_API_KEY` as environment variable.
+
+## License
+
+MIT
