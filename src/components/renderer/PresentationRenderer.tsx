@@ -97,7 +97,7 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange }: P
 
   return (
     <ThemeProvider theme={config.theme}>
-      <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "60fr 40fr" : "1fr" }}>
+      <div className="w-full h-full overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "60fr 40fr" : "1fr" }}>
         {/* Header -- row 1 */}
         <header className="px-6 py-4 flex justify-between items-center z-50" style={{ gridColumn: "1 / -1" }}>
           <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>

@@ -28,5 +28,9 @@ export default function PresentPage() {
     );
   }
 
-  return <PresentationRenderer config={config} />;
+  return (
+    <div className="w-screen h-screen">
+      <PresentationRenderer config={config} />
+    </div>
+  );
 }
