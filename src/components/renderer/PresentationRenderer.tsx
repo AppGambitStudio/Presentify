@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2, MessageSquare, Presentation } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { savePresentation } from "@/lib/store";
 import type { PresentationConfig, Slide } from "@/lib/types";
 import { SlideEditor } from "./SlideEditor";
 import { ThemeProvider } from "./ThemeProvider";
@@ -77,10 +78,15 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
   const toggleEditor = useCallback(() => setShowEditor((v) => !v), []);
 
   const handleSlideUpdate = useCallback((updated: Slide) => {
-    setConfig((prev) => ({
-      ...prev,
-      slides: prev.slides.map((s) => (s.id === updated.id ? updated : s)),
-    }));
+    setConfig((prev) => {
+      const newConfig = {
+        ...prev,
+        lastModified: new Date().toISOString(),
+        slides: prev.slides.map((s) => (s.id === updated.id ? updated : s)),
+      };
+      savePresentation(newConfig);
+      return newConfig;
+    });
   }, []);
 
   useEffect(() => {
