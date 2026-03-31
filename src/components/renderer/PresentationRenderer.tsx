@@ -1,7 +1,8 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2, MessageSquare, Presentation } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
 import type { PresentationConfig, Slide } from "@/lib/types";
 import { SlideEditor } from "./SlideEditor";
 import { ThemeProvider } from "./ThemeProvider";
@@ -36,6 +37,8 @@ interface PresentationRendererProps {
 }
 
 export function PresentationRenderer({ config: initialConfig, onSlideChange, workspaceMode = false }: PresentationRendererProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [config, setConfig] = useState(initialConfig);
   useEffect(() => { setConfig(initialConfig); }, [initialConfig]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -152,6 +155,23 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
           </button>
           <button onClick={toggleEditor} className="p-3 rounded-full transition-all" style={{ backgroundColor: showEditor ? "var(--slide-primary)" : "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)", color: showEditor ? "var(--slide-bg)" : "var(--slide-text)" }} title="Toggle JSON Editor (E)">
             <Code2 size={20} />
+          </button>
+          <button
+            onClick={() => {
+              // Toggle between /p/[id] (workspace) and /p/[id]/present
+              const isPresent = pathname.endsWith("/present");
+              const base = isPresent ? pathname.replace(/\/present$/, "") : pathname;
+              router.push(isPresent ? base : `${base}/present`);
+            }}
+            className="p-3 rounded-full transition-all"
+            style={{
+              backgroundColor: workspaceMode ? "var(--slide-card-bg)" : "var(--slide-primary)",
+              border: "1px solid var(--slide-card-border)",
+              color: workspaceMode ? "var(--slide-text)" : "var(--slide-bg)",
+            }}
+            title={workspaceMode ? "Switch to Present mode" : "Switch to Workspace (Chat)"}
+          >
+            {workspaceMode ? <Presentation size={20} /> : <MessageSquare size={20} />}
           </button>
         </nav>
 
