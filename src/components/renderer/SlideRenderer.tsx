@@ -155,11 +155,18 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId, sectionInde
         style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)`, ...wrapperStyle }}
       >
         {showId && <SectionBadge id={sectionId} />}
-        {section.columns.map((col, i) => (
-          <div key={i}>
-            {renderComponent(col.component, col.props, editable, (newProps) => handleColumnPropsChange(i, newProps))}
-          </div>
-        ))}
+        {section.columns.map((col, i) => {
+          const colStyle = col.style ? buildSectionWrapper(col.style, col.component, isFirstSlide) : null;
+          return (
+            <div
+              key={i}
+              className={colStyle?.className || ""}
+              style={colStyle?.wrapperStyle && Object.keys(colStyle.wrapperStyle).length > 0 ? colStyle.wrapperStyle : undefined}
+            >
+              {renderComponent(col.component, col.props, editable, (newProps) => handleColumnPropsChange(i, newProps))}
+            </div>
+          );
+        })}
       </div>
     );
   }

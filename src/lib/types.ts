@@ -57,6 +57,7 @@ export interface SectionStyle {
 export interface SectionItem {
   component: ComponentType;
   props: Record<string, any>;
+  style?: SectionStyle;
 }
 
 export type Section =
