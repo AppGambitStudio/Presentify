@@ -3,24 +3,40 @@
 import React from "react";
 import type { Slide, Section, SectionStyle, ComponentType } from "@/lib/types";
 import { componentRegistry } from "@/components/slides";
+import { EditProvider, useEdit } from "./EditContext";
+import { EditableText } from "./EditableText";
 
 interface SlideRendererProps {
   slide: Slide;
   showSectionIds?: boolean;
+  workspaceMode?: boolean;
+  onSlideUpdate?: (updated: Slide) => void;
 }
 
-function renderComponent(component: ComponentType, props: Record<string, any>) {
+function renderComponent(component: ComponentType, props: Record<string, any>, editable: boolean, onPropsChange?: (newProps: Record<string, any>) => void) {
   const Component = componentRegistry[component];
   if (!Component) {
     console.warn(`Unknown component: ${component}`);
     return null;
   }
-  const clean: Record<string, any> = {};
-  for (const [k, v] of Object.entries(props)) {
-    if (v && typeof v === "object" && !Array.isArray(v) && v.component) continue;
-    clean[k] = v;
+
+  // Safety: wrap in try-catch so a bad prop doesn't crash the whole slide
+  try {
+    const clean: Record<string, any> = {};
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v && typeof v === "object" && !Array.isArray(v) && v.component) continue;
+      clean[k] = v;
+    }
+  // Pass edit callbacks for components that support inline editing
+  if (editable && onPropsChange) {
+    clean.__editable = true;
+    clean.__onPropsChange = onPropsChange;
   }
-  return <Component {...clean} />;
+    return <Component {...clean} />;
+  } catch (err) {
+    console.error(`Error rendering ${component}:`, err);
+    return <div className="text-red-400 text-sm p-2">Error rendering {component}</div>;
+  }
 }
 
 // Components that look better wrapped in glass-panel by default
@@ -35,37 +51,28 @@ function buildSectionWrapper(
   const classes: string[] = [];
   const wrapperStyle: React.CSSProperties = {};
 
-  // Alignment -- use flexbox for true centering (text-center alone doesn't work on flex children)
   const align = s.align || (isFirstSlide ? "center" : undefined);
-  if (align === "center") {
-    classes.push("flex flex-col items-center text-center");
-  } else if (align === "right") {
-    classes.push("flex flex-col items-end text-right");
-  }
+  if (align === "center") classes.push("flex flex-col items-center text-center");
+  else if (align === "right") classes.push("flex flex-col items-end text-right");
 
-  // Glass panel
   if (s.glass || (s.glass === undefined && component && GLASS_BY_DEFAULT.has(component))) {
     classes.push("glass-panel");
   }
 
-  // Accent border
   if (s.accent) {
     wrapperStyle.borderLeft = `4px solid ${s.accent}`;
     wrapperStyle.paddingLeft = "1.5rem";
   }
 
-  // Spacing
   if (s.spacing === "none") wrapperStyle.padding = "0";
   else if (s.spacing === "tight") wrapperStyle.padding = "0.25rem 0";
   else if (s.spacing === "loose") wrapperStyle.padding = "1.5rem 0";
 
-  // Max width constraint
   if (s.maxWidth) {
     wrapperStyle.maxWidth = s.maxWidth;
     if (align === "center") wrapperStyle.margin = "0 auto";
   }
 
-  // Padding override
   if (s.padding) wrapperStyle.padding = s.padding;
 
   return { className: classes.join(" "), wrapperStyle };
@@ -87,15 +94,31 @@ function SectionBadge({ id }: { id: string }) {
   );
 }
 
-function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section: Section; isFirstSlide: boolean; sectionId: string; showId: boolean }) {
+function SectionRenderer({ section, isFirstSlide, sectionId, showId, sectionIndex }: {
+  section: Section; isFirstSlide: boolean; sectionId: string; showId: boolean; sectionIndex: number;
+}) {
+  const { editable, onSectionUpdate } = useEdit();
+
+  const handlePropsChange = (newProps: Record<string, any>) => {
+    if (section.type === "full") {
+      onSectionUpdate(sectionIndex, { ...section, props: newProps });
+    }
+  };
+
+  const handleColumnPropsChange = (colIndex: number, newProps: Record<string, any>) => {
+    if (section.type === "columns") {
+      const newColumns = [...section.columns];
+      newColumns[colIndex] = { ...newColumns[colIndex], props: newProps };
+      onSectionUpdate(sectionIndex, { ...section, columns: newColumns });
+    }
+  };
+
   if (section.type === "full") {
-    const { className, wrapperStyle } = buildSectionWrapper(
-      section.style, section.component, isFirstSlide
-    );
+    const { className, wrapperStyle } = buildSectionWrapper(section.style, section.component, isFirstSlide);
     return (
       <div className={`relative ${className}`} style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}>
         {showId && <SectionBadge id={sectionId} />}
-        {renderComponent(section.component, section.props)}
+        {renderComponent(section.component, section.props, editable, handlePropsChange)}
       </div>
     );
   }
@@ -111,7 +134,7 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section
         {showId && <SectionBadge id={sectionId} />}
         {section.columns.map((col, i) => (
           <div key={i}>
-            {renderComponent(col.component, col.props)}
+            {renderComponent(col.component, col.props, editable, (newProps) => handleColumnPropsChange(i, newProps))}
           </div>
         ))}
       </div>
@@ -121,7 +144,7 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section
   return null;
 }
 
-export function SlideRenderer({ slide, showSectionIds = false }: SlideRendererProps) {
+export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = false, onSlideUpdate }: SlideRendererProps) {
   let displayTitle = slide.title;
   if (slide.titleAccent) {
     const idx = displayTitle.lastIndexOf(slide.titleAccent);
@@ -132,55 +155,88 @@ export function SlideRenderer({ slide, showSectionIds = false }: SlideRendererPr
 
   const isFirstSlide = slide.number === 1;
   const isSparse = slide.sections.length <= 2;
+  const editable = workspaceMode && !!onSlideUpdate;
+
+  const handleTitleUpdate = (newTitle: string) => {
+    if (onSlideUpdate) {
+      // Reconstruct full title with accent
+      const fullTitle = slide.titleAccent ? newTitle + slide.titleAccent : newTitle;
+      onSlideUpdate({ ...slide, title: fullTitle });
+    }
+  };
+
+  const handleSubtitleUpdate = (newSubtitle: string) => {
+    if (onSlideUpdate) {
+      onSlideUpdate({ ...slide, subtitle: newSubtitle });
+    }
+  };
+
+  const handleSectionUpdate = (sectionIndex: number, updatedSection: Section) => {
+    if (onSlideUpdate) {
+      const newSections = [...slide.sections];
+      newSections[sectionIndex] = updatedSection;
+      onSlideUpdate({ ...slide, sections: newSections });
+    }
+  };
 
   return (
-    <div className="slide-content">
-      <div
-        className="w-full flex-1 flex flex-col justify-center overflow-hidden"
-        style={{ gap: slide.gap || (isSparse ? "2rem" : "1.25rem") }}
-      >
-        {/* Title area */}
-        {slide.title && (
-          <div className="text-center">
-            <h1
-              className={`font-bold leading-tight ${
-                isFirstSlide
-                  ? "text-4xl md:text-6xl lg:text-7xl"
-                  : "text-3xl md:text-4xl lg:text-5xl"
-              }`}
-              style={{ fontFamily: "var(--slide-font-heading)" }}
-            >
-              {displayTitle}
-              {slide.titleAccent && (
-                <span style={{ color: "var(--slide-primary)" }}>{slide.titleAccent}</span>
-              )}
-            </h1>
-            {slide.subtitle && (
-              <p
-                className={`${
+    <EditProvider
+      editable={editable}
+      onSectionUpdate={handleSectionUpdate}
+      onTitleUpdate={handleTitleUpdate}
+      onSubtitleUpdate={handleSubtitleUpdate}
+    >
+      <div className="slide-content">
+        <div
+          className="w-full flex-1 flex flex-col justify-center overflow-hidden"
+          style={{ gap: slide.gap || (isSparse ? "2rem" : "1.25rem") }}
+        >
+          {/* Title area */}
+          {slide.title && (
+            <div className="text-center">
+              <h1
+                className={`font-bold leading-tight ${
                   isFirstSlide
-                    ? "mt-5 text-xl md:text-2xl"
-                    : "mt-3 text-base md:text-xl"
+                    ? "text-4xl md:text-6xl lg:text-7xl"
+                    : "text-3xl md:text-4xl lg:text-5xl"
                 }`}
-                style={{ color: "var(--slide-text-muted)" }}
+                style={{ fontFamily: "var(--slide-font-heading)" }}
               >
-                {slide.subtitle}
-              </p>
-            )}
-          </div>
-        )}
+                <EditableText
+                  value={displayTitle}
+                  onChange={handleTitleUpdate}
+                  editable={editable}
+                />
+                {slide.titleAccent && (
+                  <span style={{ color: "var(--slide-primary)" }}>{slide.titleAccent}</span>
+                )}
+              </h1>
+              {slide.subtitle && (
+                <EditableText
+                  value={slide.subtitle}
+                  onChange={handleSubtitleUpdate}
+                  editable={editable}
+                  tag="p"
+                  className={`${isFirstSlide ? "mt-5 text-xl md:text-2xl" : "mt-3 text-base md:text-xl"}`}
+                  style={{ color: "var(--slide-text-muted)" }}
+                />
+              )}
+            </div>
+          )}
 
-        {/* Sections */}
-        {slide.sections.map((section, i) => (
-          <SectionRenderer
-            key={i}
-            section={section}
-            isFirstSlide={isFirstSlide}
-            sectionId={`S${i + 1}`}
-            showId={showSectionIds}
-          />
-        ))}
+          {/* Sections */}
+          {slide.sections.map((section, i) => (
+            <SectionRenderer
+              key={i}
+              section={section}
+              isFirstSlide={isFirstSlide}
+              sectionId={`S${i + 1}`}
+              showId={showSectionIds}
+              sectionIndex={i}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </EditProvider>
   );
 }

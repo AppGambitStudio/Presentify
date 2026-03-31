@@ -126,7 +126,7 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
               className="absolute inset-0 w-full h-full"
             >
               <SlideDecorations decorations={slide.decorations} />
-              <SlideRenderer slide={slide} showSectionIds={workspaceMode} />
+              <SlideRenderer slide={slide} showSectionIds={workspaceMode} workspaceMode={workspaceMode} onSlideUpdate={handleSlideUpdate} />
             </motion.div>
           </AnimatePresence>
         </main>
