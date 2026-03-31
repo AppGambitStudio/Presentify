@@ -30,7 +30,7 @@ To align a section, add "style": {"align": "center"} to that section.
 To reduce spacing, set the slide "gap" field (e.g. "0.5rem" for tight, "1rem" for normal).
 To reduce a section's padding, add "style": {"spacing": "tight"} or {"spacing": "none"}.
 To constrain width, add "style": {"maxWidth": "600px"}.
-To change font size, add "style": {"fontSize": "120%"} (percentage relative) or {"fontSize": "24px"} (absolute).
+To change font size/scale, add "style": {"fontSize": "125%"} to scale everything in section by 25%. Use percentages only.
 To change text color, add "style": {"color": "#FF9900"}.
 
 Always respond with ONLY valid JSON, no markdown formatting or explanation.`;

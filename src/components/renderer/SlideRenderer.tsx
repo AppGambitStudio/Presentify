@@ -85,7 +85,17 @@ function buildSectionWrapper(
   }
 
   if (s.padding) wrapperStyle.padding = s.padding;
-  if (s.fontSize) wrapperStyle.fontSize = s.fontSize;
+  if (s.fontSize) {
+    // Use zoom for scaling -- it overrides Tailwind's hardcoded font sizes
+    // Convert percentage strings like "125%" to zoom value like 1.25
+    const match = s.fontSize.match(/^(\d+)%$/);
+    if (match) {
+      (wrapperStyle as any).zoom = parseInt(match[1]) / 100;
+    } else {
+      // For absolute values, set font-size and hope for inheritance
+      wrapperStyle.fontSize = s.fontSize;
+    }
+  }
   if (s.color) wrapperStyle.color = s.color;
 
   return { className: classes.join(" "), wrapperStyle };
