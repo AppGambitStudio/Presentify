@@ -81,8 +81,9 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange }: P
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't capture keys when editor textarea is focused
-      if (showEditor && (e.target as HTMLElement)?.tagName === "TEXTAREA") return;
+      // Don't capture keys when any input/textarea is focused
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") nextSlide();
       if (e.key === "ArrowLeft" || e.key === "PageUp") prevSlide();
       if (e.key === "f") toggleFullscreen();
