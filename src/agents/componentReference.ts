@@ -45,7 +45,7 @@ Sections flow top-to-bottom. Each section is either:
 | ComparisonTable | headers[], rows[][] | Side-by-side comparisons |
 | StatCallout | value, label, color? (hex only e.g. "#FF9900") | Big numbers, stats |
 | QuoteBlock | text, attribution? | Quotes, key messages |
-| IconCard | icon (lucide name), title, desc, color? (hex only) | Feature cards |
+| IconCard | icon? (lucide name), title, desc, color? (hex), layout? ("vertical"/"horizontal") | Feature cards. Omit icon for plain card. Use layout "horizontal" for compact side-by-side. |
 | CardGrid | cards[{icon, title, desc, color? (hex)}], columns? | Grid of cards |
 | CTABox | text (newline for multi-line), color? (hex only) | Call-to-action |
 | CodeBlock | code, language? | Code samples |

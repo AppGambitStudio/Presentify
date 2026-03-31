@@ -20,7 +20,7 @@ export function BulletList({ items, icon, __editable, __onPropsChange }: BulletL
   };
 
   return (
-    <ul className="space-y-5">
+    <ul className="space-y-5" style={{ width: "fit-content" }}>
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-4 text-xl" style={{ color: "var(--slide-text-muted)" }}>
           {Icon ? (

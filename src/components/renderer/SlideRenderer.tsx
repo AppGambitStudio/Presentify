@@ -52,8 +52,19 @@ function buildSectionWrapper(
   const wrapperStyle: React.CSSProperties = {};
 
   const align = s.align || (isFirstSlide ? "center" : undefined);
-  if (align === "center") classes.push("flex flex-col items-center text-center");
-  else if (align === "right") classes.push("flex flex-col items-end text-right");
+  if (align === "center") {
+    // Use margin auto to center the child block. items-center alone doesn't work
+    // when children are full-width (like <ul>).
+    wrapperStyle.display = "flex";
+    wrapperStyle.flexDirection = "column";
+    wrapperStyle.alignItems = "center";
+    wrapperStyle.textAlign = "center";
+  } else if (align === "right") {
+    wrapperStyle.display = "flex";
+    wrapperStyle.flexDirection = "column";
+    wrapperStyle.alignItems = "flex-end";
+    wrapperStyle.textAlign = "right";
+  }
 
   if (s.glass || (s.glass === undefined && component && GLASS_BY_DEFAULT.has(component))) {
     classes.push("glass-panel");
