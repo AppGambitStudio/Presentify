@@ -29,10 +29,14 @@ const slideVariants = {
   }),
 };
 
-interface PresentationRendererProps { config: PresentationConfig; }
+interface PresentationRendererProps {
+  config: PresentationConfig;
+  onSlideChange?: (index: number) => void;
+}
 
-export function PresentationRenderer({ config: initialConfig }: PresentationRendererProps) {
+export function PresentationRenderer({ config: initialConfig, onSlideChange }: PresentationRendererProps) {
   const [config, setConfig] = useState(initialConfig);
+  useEffect(() => { setConfig(initialConfig); }, [initialConfig]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -40,12 +44,26 @@ export function PresentationRenderer({ config: initialConfig }: PresentationRend
   const totalSlides = config.slides.length;
 
   const nextSlide = useCallback(() => {
-    if (currentSlide < totalSlides - 1) { setDirection(1); setCurrentSlide((s) => s + 1); }
-  }, [currentSlide, totalSlides]);
+    if (currentSlide < totalSlides - 1) {
+      setDirection(1);
+      setCurrentSlide((s) => {
+        const next = s + 1;
+        onSlideChange?.(next);
+        return next;
+      });
+    }
+  }, [currentSlide, totalSlides, onSlideChange]);
 
   const prevSlide = useCallback(() => {
-    if (currentSlide > 0) { setDirection(-1); setCurrentSlide((s) => s - 1); }
-  }, [currentSlide]);
+    if (currentSlide > 0) {
+      setDirection(-1);
+      setCurrentSlide((s) => {
+        const prev = s - 1;
+        onSlideChange?.(prev);
+        return prev;
+      });
+    }
+  }, [currentSlide, onSlideChange]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); setIsFullscreen(true); }
