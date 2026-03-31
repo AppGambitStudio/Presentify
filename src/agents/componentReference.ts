@@ -32,6 +32,8 @@ Sections flow top-to-bottom. Each section is either:
 - spacing: "none" | "tight" | "normal" | "loose" -- vertical padding around section
 - maxWidth: CSS value (e.g. "600px", "80%") -- constrain section width
 - padding: CSS value -- override padding
+- fontSize: CSS value (e.g. "120%", "1.5em", "24px") -- scales all text in section. Use "120%" to increase by 20%.
+- color: hex code -- override text color for entire section
 
 ## Available Components
 

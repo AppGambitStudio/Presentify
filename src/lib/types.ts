@@ -49,6 +49,8 @@ export interface SectionStyle {
   spacing?: "none" | "tight" | "normal" | "loose";
   maxWidth?: string;        // constrain section width (e.g. "600px", "80%")
   padding?: string;         // CSS padding override
+  fontSize?: string;        // CSS font-size (e.g. "1.2em", "120%", "24px"). Inherits to all children.
+  color?: string;           // text color override (hex)
 }
 
 // --- Section (content block within a slide) ---

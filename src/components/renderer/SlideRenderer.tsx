@@ -74,6 +74,8 @@ function buildSectionWrapper(
   }
 
   if (s.padding) wrapperStyle.padding = s.padding;
+  if (s.fontSize) wrapperStyle.fontSize = s.fontSize;
+  if (s.color) wrapperStyle.color = s.color;
 
   return { className: classes.join(" "), wrapperStyle };
 }
