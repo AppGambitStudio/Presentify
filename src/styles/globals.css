@@ -41,13 +41,20 @@
 .glass-panel {
   background: var(--slide-card-bg);
   border: 1px solid var(--slide-card-border);
-  @apply backdrop-blur-lg rounded-2xl p-6 md:p-8 relative overflow-hidden;
+  @apply backdrop-blur-lg rounded-2xl p-5 md:p-7 relative overflow-hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Elevated variant with depth */
 .glass-panel.shadow-lg {
   box-shadow:
     0 4px 30px rgba(0, 0, 0, 0.3),
-    0 0 1px var(--slide-card-border);
+    0 0 1px var(--slide-card-border),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* --- Shimmer effect for glass panels --- */
@@ -62,4 +69,44 @@
   0% { transform: translateX(-100%); }
   15% { transform: translateX(100%); }
   100% { transform: translateX(100%); }
+}
+
+/* --- Slide title accent gradient --- */
+.slide-title-accent {
+  background: linear-gradient(135deg, var(--slide-primary), var(--slide-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Quote styling --- */
+blockquote {
+  position: relative;
+}
+
+blockquote::before {
+  content: "\201C";
+  position: absolute;
+  top: -0.5rem;
+  left: -0.5rem;
+  font-size: 4rem;
+  line-height: 1;
+  opacity: 0.15;
+  color: var(--slide-primary);
+  font-family: var(--slide-font-heading);
+}
+
+/* --- Comparison Table rows --- */
+table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* --- Progress bar glow --- */
+.progress-bar-glow {
+  box-shadow: 0 0 8px var(--slide-primary), 0 0 2px var(--slide-primary);
+}
+
+/* --- Smooth scroll for non-presentation pages --- */
+html {
+  scroll-behavior: smooth;
 }

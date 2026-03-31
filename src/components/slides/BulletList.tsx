@@ -1,4 +1,4 @@
-import * as LucideIcons from "lucide-react";
+import { resolveIcon } from "@/lib/iconResolver";
 import { parseInlineMarkdown } from "@/lib/parseMarkdown";
 
 interface BulletListProps {
@@ -6,15 +6,9 @@ interface BulletListProps {
   icon?: string;
 }
 
-function getIcon(name: string) {
-  const IconComponent = (LucideIcons as any)[
-    name.replace(/-./g, (m) => m[1].toUpperCase()).replace(/^./, (m) => m.toUpperCase())
-  ];
-  return IconComponent || LucideIcons.Circle;
-}
 
 export function BulletList({ items, icon }: BulletListProps) {
-  const Icon = icon ? getIcon(icon) : null;
+  const Icon = icon ? resolveIcon(icon) : null;
   return (
     <ul className="space-y-5">
       {items.map((item, i) => (

@@ -1,4 +1,5 @@
-import * as LucideIcons from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { resolveIcon } from "@/lib/iconResolver";
 import QRCode from "react-qr-code";
 
 interface ShowcaseCardProps {
@@ -10,13 +11,8 @@ interface ShowcaseCardProps {
   tags?: string[];
 }
 
-function getIcon(name: string) {
-  const formatted = name.replace(/-./g, (m) => m[1].toUpperCase()).replace(/^./, (m) => m.toUpperCase());
-  return (LucideIcons as any)[formatted] || LucideIcons.Circle;
-}
-
 export function ShowcaseCard({ title, desc, icon, url, qrCode = true, tags = [] }: ShowcaseCardProps) {
-  const Icon = getIcon(icon);
+  const Icon = resolveIcon(icon);
   return (
     <div className="glass-panel flex flex-col gap-5">
       <div className="flex justify-between items-start">
@@ -29,7 +25,7 @@ export function ShowcaseCard({ title, desc, icon, url, qrCode = true, tags = [] 
               <QRCode value={url} size={56} />
             </div>
             <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs uppercase tracking-wider font-bold flex items-center gap-1" style={{ color: "var(--slide-text-muted)" }}>
-              Visit <LucideIcons.ExternalLink size={10} />
+              Visit <ExternalLink size={10} />
             </a>
           </div>
         )}

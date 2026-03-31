@@ -1,4 +1,4 @@
-import * as LucideIcons from "lucide-react";
+import { resolveIcon } from "@/lib/iconResolver";
 import { parseInlineMarkdown } from "@/lib/parseMarkdown";
 
 interface IconCardProps {
@@ -8,13 +8,9 @@ interface IconCardProps {
   color?: string;
 }
 
-function getIcon(name: string) {
-  const formatted = name.replace(/-./g, (m) => m[1].toUpperCase()).replace(/^./, (m) => m.toUpperCase());
-  return (LucideIcons as any)[formatted] || LucideIcons.Circle;
-}
 
 export function IconCard({ icon, title, desc, color }: IconCardProps) {
-  const Icon = getIcon(icon);
+  const Icon = resolveIcon(icon);
   const accentColor = color || "var(--slide-primary)";
   return (
     <div className="glass-panel flex flex-col gap-4">

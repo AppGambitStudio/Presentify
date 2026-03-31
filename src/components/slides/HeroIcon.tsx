@@ -1,16 +1,12 @@
 "use client";
-import * as LucideIcons from "lucide-react";
+import { resolveIcon } from "@/lib/iconResolver";
 import { motion } from "motion/react";
 
 interface HeroIconProps { icon: string; size?: number; caption: string; subcaption?: string; glowColor?: string; }
 
-function getIcon(name: string) {
-  const formatted = name.replace(/-./g, (m) => m[1].toUpperCase()).replace(/^./, (m) => m.toUpperCase());
-  return (LucideIcons as any)[formatted] || LucideIcons.Circle;
-}
 
 export function HeroIcon({ icon, size = 96, caption, subcaption, glowColor }: HeroIconProps) {
-  const Icon = getIcon(icon);
+  const Icon = resolveIcon(icon);
   const color = glowColor || "var(--slide-primary)";
   return (
     <div className="flex flex-col items-center text-center relative">
