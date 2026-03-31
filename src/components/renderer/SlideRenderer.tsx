@@ -24,9 +24,9 @@ function renderComponent(component: ComponentType, props: Record<string, any>) {
 }
 
 // Components that look better wrapped in glass-panel by default
-const GLASS_BY_DEFAULT = new Set(["IconCard", "CardGrid", "ComparisonTable", "NumberedSteps", "ShowcaseCard"]);
+const GLASS_BY_DEFAULT = new Set(["ComparisonTable", "NumberedSteps"]);
 
-function buildSectionClasses(
+function buildSectionWrapper(
   style: SectionStyle | undefined,
   component: string | undefined,
   isFirstSlide: boolean
@@ -35,17 +35,17 @@ function buildSectionClasses(
   const classes: string[] = [];
   const wrapperStyle: React.CSSProperties = {};
 
-  // Alignment: inherit from section style, or center on first slide
+  // Alignment -- use flexbox for true centering (text-center alone doesn't work on flex children)
   const align = s.align || (isFirstSlide ? "center" : undefined);
-  if (align) classes.push(`text-${align}`);
+  if (align === "center") {
+    classes.push("flex flex-col items-center text-center");
+  } else if (align === "right") {
+    classes.push("flex flex-col items-end text-right");
+  }
 
-  // Glass panel: from section style, or default for certain components
+  // Glass panel
   if (s.glass || (s.glass === undefined && component && GLASS_BY_DEFAULT.has(component))) {
-    // Don't double-wrap -- the component itself may already be a glass panel (like IconCard)
-    // Only wrap in glass for ComparisonTable and NumberedSteps
-    if (component === "ComparisonTable" || component === "NumberedSteps") {
-      classes.push("glass-panel");
-    }
+    classes.push("glass-panel");
   }
 
   // Accent border
@@ -55,8 +55,18 @@ function buildSectionClasses(
   }
 
   // Spacing
-  if (s.spacing === "tight") classes.push("py-1");
-  else if (s.spacing === "loose") classes.push("py-4");
+  if (s.spacing === "none") wrapperStyle.padding = "0";
+  else if (s.spacing === "tight") wrapperStyle.padding = "0.25rem 0";
+  else if (s.spacing === "loose") wrapperStyle.padding = "1.5rem 0";
+
+  // Max width constraint
+  if (s.maxWidth) {
+    wrapperStyle.maxWidth = s.maxWidth;
+    if (align === "center") wrapperStyle.margin = "0 auto";
+  }
+
+  // Padding override
+  if (s.padding) wrapperStyle.padding = s.padding;
 
   return { className: classes.join(" "), wrapperStyle };
 }
@@ -79,7 +89,7 @@ function SectionBadge({ id }: { id: string }) {
 
 function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section: Section; isFirstSlide: boolean; sectionId: string; showId: boolean }) {
   if (section.type === "full") {
-    const { className, wrapperStyle } = buildSectionClasses(
+    const { className, wrapperStyle } = buildSectionWrapper(
       section.style, section.component, isFirstSlide
     );
     return (
@@ -92,7 +102,7 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section
 
   if (section.type === "columns") {
     const colCount = section.columns.length;
-    const { className } = buildSectionClasses(section.style, undefined, isFirstSlide);
+    const { className } = buildSectionWrapper(section.style, undefined, isFirstSlide);
     return (
       <div
         className={`relative w-full gap-5 md:gap-8 ${className}`}
@@ -125,7 +135,10 @@ export function SlideRenderer({ slide, showSectionIds = false }: SlideRendererPr
 
   return (
     <div className="slide-content">
-      <div className={`w-full flex-1 flex flex-col justify-center overflow-hidden ${isSparse ? "gap-8 md:gap-10" : "gap-5 md:gap-7"}`}>
+      <div
+        className="w-full flex-1 flex flex-col justify-center overflow-hidden"
+        style={{ gap: slide.gap || (isSparse ? "2rem" : "1.25rem") }}
+      >
         {/* Title area */}
         {slide.title && (
           <div className="text-center">

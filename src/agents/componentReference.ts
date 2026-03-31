@@ -6,6 +6,7 @@ Each slide has:
 - titleAccent?: string (portion of title to highlight in primary color)
 - subtitle?: string
 - sections: array of content blocks
+- gap?: CSS gap between sections (e.g. "1rem", "2rem", "0.5rem"). Controls vertical spacing.
 - decorations: ["glow-pulse", "gradient-blob", "shimmer"] (optional background effects)
 
 IMPORTANT for titleAccent: the title should contain the FULL text. titleAccent highlights a PORTION of it.
@@ -25,10 +26,12 @@ Sections flow top-to-bottom. Each section is either:
 ], "style": { ... } }
 
 **Section style (optional):**
-- glass: boolean -- wrap in glass panel (auto-applied for IconCard, CardGrid, ComparisonTable, NumberedSteps)
-- align: "left" | "center" | "right" -- text alignment override
+- glass: boolean -- wrap in glass panel (auto-applied for ComparisonTable, NumberedSteps)
+- align: "left" | "center" | "right" -- alignment (uses flexbox, works on all components including BulletList)
 - accent: "#hex" -- left border accent color
-- spacing: "tight" | "normal" | "loose"
+- spacing: "none" | "tight" | "normal" | "loose" -- vertical padding around section
+- maxWidth: CSS value (e.g. "600px", "80%") -- constrain section width
+- padding: CSS value -- override padding
 
 ## Available Components
 

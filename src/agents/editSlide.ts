@@ -24,6 +24,13 @@ Rules:
 - All color values must be hex codes (e.g. "#FF9900")
 - titleAccent must be a substring at the END of title
 
+When user references sections by ID (S1, S2, S3...), map to sections array index (S1 = sections[0], S2 = sections[1], etc.)
+
+To align a section, add "style": {"align": "center"} to that section.
+To reduce spacing, set the slide "gap" field (e.g. "0.5rem" for tight, "1rem" for normal).
+To reduce a section's padding, add "style": {"spacing": "tight"} or {"spacing": "none"}.
+To constrain width, add "style": {"maxWidth": "600px"}.
+
 Always respond with ONLY valid JSON, no markdown formatting or explanation.`;
 
   const userMessage = `Presentation: "${config.title}"

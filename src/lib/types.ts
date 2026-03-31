@@ -46,7 +46,9 @@ export interface SectionStyle {
   glass?: boolean;          // wrap in glass-panel
   align?: "left" | "center" | "right";
   accent?: string;          // left border accent color (hex)
-  spacing?: "tight" | "normal" | "loose";
+  spacing?: "none" | "tight" | "normal" | "loose";
+  maxWidth?: string;        // constrain section width (e.g. "600px", "80%")
+  padding?: string;         // CSS padding override
 }
 
 // --- Section (content block within a slide) ---
@@ -69,6 +71,7 @@ export interface Slide {
   title: string;
   titleAccent?: string;
   subtitle?: string;
+  gap?: string;             // CSS gap between sections (e.g. "1rem", "2rem"). Default: auto
   sections: Section[];
   speakerNotes: string;
   decorations: SlideDecoration[];
