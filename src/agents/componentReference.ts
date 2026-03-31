@@ -32,15 +32,15 @@ Sections flow top-to-bottom. Each section is either:
 | BulletList | items[], icon? (lucide name) | Lists of points |
 | NumberedSteps | steps[{title, desc}], style? ("compact"/"hero") | Step-by-step processes |
 | ComparisonTable | headers[], rows[][] | Side-by-side comparisons |
-| StatCallout | value, label, color? | Big numbers, stats |
+| StatCallout | value, label, color? (hex only e.g. "#FF9900") | Big numbers, stats |
 | QuoteBlock | text, attribution? | Quotes, key messages |
-| IconCard | icon (lucide name), title, desc, color? | Feature cards |
-| CardGrid | cards[{icon, title, desc, color?}], columns? | Grid of cards |
-| CTABox | text (newline for multi-line), color? | Call-to-action |
+| IconCard | icon (lucide name), title, desc, color? (hex only) | Feature cards |
+| CardGrid | cards[{icon, title, desc, color? (hex)}], columns? | Grid of cards |
+| CTABox | text (newline for multi-line), color? (hex only) | Call-to-action |
 | CodeBlock | code, language? | Code samples |
 | ChartBlock | type (bar/pie/line), data[{label, value}] | Charts |
 | ImageBlock | url, alt, fit? | Images |
-| TagList | tags[], color? | Tag badges |
+| TagList | tags[], color? (hex only) | Tag badges |
 | ShowcaseCard | title, desc, icon, url, qrCode?, tags[] | Product showcase with QR |
 | HeroIcon | icon, size?, caption, subcaption? | Large decorative icon |
 | PromptBlock | label, code, result, variant? (before/after) | Prompt display |
@@ -52,4 +52,5 @@ Sections flow top-to-bottom. Each section is either:
 - BulletList items should be short (under 10 words each)
 - One CTABox per slide maximum
 - Don't use Heading component in sections (title field handles headings)
+- ALL color values MUST be hex codes (e.g. "#FF9900", "#0073BB"). Never use named colors like "red", "blue", "green". Omit the color prop to use the theme default.
 `;
