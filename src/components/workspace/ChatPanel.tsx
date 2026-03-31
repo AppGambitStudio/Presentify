@@ -38,7 +38,7 @@ export function ChatPanel({ onSendMessage, isLoading, slideNumber }: ChatPanelPr
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ borderLeft: "1px solid var(--slide-card-border)", backgroundColor: "var(--slide-bg)" }}>
+    <div className="flex flex-col overflow-hidden" style={{ height: "100%", minHeight: 0, borderLeft: "1px solid var(--slide-card-border)", backgroundColor: "var(--slide-bg)" }}>
       {/* Header */}
       <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "var(--slide-card-border)" }}>
         <span className="text-sm font-bold" style={{ fontFamily: "var(--slide-font-heading)" }}>
@@ -50,7 +50,7 @@ export function ChatPanel({ onSendMessage, isLoading, slideNumber }: ChatPanelPr
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ minHeight: 0 }}>
         {messages.length === 0 && (
           <div className="text-center py-8" style={{ color: "var(--slide-text-muted)" }}>
             <p className="text-sm mb-3">Tell me how to change this slide</p>

@@ -93,12 +93,12 @@ export default function WorkspacePage() {
         </Link>
       </div>
 
-      {/* Preview */}
-      <div className="relative overflow-hidden">
+      {/* Preview -- row 2, col 1 */}
+      <div className="relative overflow-hidden" style={{ minHeight: 0 }}>
         <PresentationRenderer config={config} onSlideChange={setCurrentSlideIndex} workspaceMode={true} />
       </div>
 
-      {/* Chat Panel */}
+      {/* Chat Panel -- row 2, col 2 */}
       <ChatPanel
         onSendMessage={handleChatMessage}
         isLoading={isEditing}
