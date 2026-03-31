@@ -2,6 +2,8 @@
 
 Open-source AI-powered presentation builder. Describe your talk, AI generates beautiful animated slides. Edit with chat or click.
 
+> **⚠️ IMPORTANT: No authentication is included.** This app uses your Anthropic API key on the backend (`ANTHROPIC_API_KEY`). Every presentation generation and chat edit makes real API calls — Opus for planning, Sonnet for each slide and edit. **Do NOT deploy publicly without adding authentication**, or anyone can use your API key and run up costs. This is designed for **local use or private/internal deployments only**.
+
 ## Quick Start
 
 ```bash
@@ -97,6 +99,8 @@ src/
 
 ## Roadmap
 
+- [ ] Authentication (protect API routes)
+- [ ] BYOK (Bring Your Own Key) per user
 - [ ] Export as standalone HTML
 - [ ] Export as downloadable project
 - [ ] MCP integration (web search, images)
@@ -106,6 +110,8 @@ src/
 ## Deploy
 
 Works on Vercel, Netlify, or any Node.js host. Set `ANTHROPIC_API_KEY` as environment variable.
+
+**Before deploying publicly:** Add authentication (e.g. NextAuth, Clerk) to protect the API routes. Without auth, anyone can trigger API calls on your key. See the roadmap for planned auth support.
 
 ## License
 
