@@ -32,9 +32,10 @@ const slideVariants = {
 interface PresentationRendererProps {
   config: PresentationConfig;
   onSlideChange?: (index: number) => void;
+  workspaceMode?: boolean;
 }
 
-export function PresentationRenderer({ config: initialConfig, onSlideChange }: PresentationRendererProps) {
+export function PresentationRenderer({ config: initialConfig, onSlideChange, workspaceMode = false }: PresentationRendererProps) {
   const [config, setConfig] = useState(initialConfig);
   useEffect(() => { setConfig(initialConfig); }, [initialConfig]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -122,7 +123,7 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange }: P
               className="absolute inset-0 w-full h-full"
             >
               <SlideDecorations decorations={slide.decorations} />
-              <SlideRenderer slide={slide} />
+              <SlideRenderer slide={slide} showSectionIds={workspaceMode} />
             </motion.div>
           </AnimatePresence>
         </main>

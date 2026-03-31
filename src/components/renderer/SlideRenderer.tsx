@@ -6,6 +6,7 @@ import { componentRegistry } from "@/components/slides";
 
 interface SlideRendererProps {
   slide: Slide;
+  showSectionIds?: boolean;
 }
 
 function renderComponent(component: ComponentType, props: Record<string, any>) {
@@ -60,13 +61,29 @@ function buildSectionClasses(
   return { className: classes.join(" "), wrapperStyle };
 }
 
-function SectionRenderer({ section, isFirstSlide }: { section: Section; isFirstSlide: boolean }) {
+function SectionBadge({ id }: { id: string }) {
+  return (
+    <span
+      className="absolute -top-2 -left-2 z-20 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold leading-none"
+      style={{
+        backgroundColor: "var(--slide-primary)",
+        color: "var(--slide-bg)",
+        opacity: 0.8,
+      }}
+    >
+      {id}
+    </span>
+  );
+}
+
+function SectionRenderer({ section, isFirstSlide, sectionId, showId }: { section: Section; isFirstSlide: boolean; sectionId: string; showId: boolean }) {
   if (section.type === "full") {
     const { className, wrapperStyle } = buildSectionClasses(
       section.style, section.component, isFirstSlide
     );
     return (
-      <div className={className} style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}>
+      <div className={`relative ${className}`} style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}>
+        {showId && <SectionBadge id={sectionId} />}
         {renderComponent(section.component, section.props)}
       </div>
     );
@@ -77,9 +94,10 @@ function SectionRenderer({ section, isFirstSlide }: { section: Section; isFirstS
     const { className } = buildSectionClasses(section.style, undefined, isFirstSlide);
     return (
       <div
-        className={`w-full gap-5 md:gap-8 ${className}`}
+        className={`relative w-full gap-5 md:gap-8 ${className}`}
         style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
       >
+        {showId && <SectionBadge id={sectionId} />}
         {section.columns.map((col, i) => (
           <div key={i}>
             {renderComponent(col.component, col.props)}
@@ -92,7 +110,7 @@ function SectionRenderer({ section, isFirstSlide }: { section: Section; isFirstS
   return null;
 }
 
-export function SlideRenderer({ slide }: SlideRendererProps) {
+export function SlideRenderer({ slide, showSectionIds = false }: SlideRendererProps) {
   let displayTitle = slide.title;
   if (slide.titleAccent) {
     const idx = displayTitle.lastIndexOf(slide.titleAccent);
@@ -140,7 +158,13 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
 
         {/* Sections */}
         {slide.sections.map((section, i) => (
-          <SectionRenderer key={i} section={section} isFirstSlide={isFirstSlide} />
+          <SectionRenderer
+            key={i}
+            section={section}
+            isFirstSlide={isFirstSlide}
+            sectionId={`S${i + 1}`}
+            showId={showSectionIds}
+          />
         ))}
       </div>
     </div>

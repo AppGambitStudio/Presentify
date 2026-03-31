@@ -6,6 +6,8 @@ import { PresentationRenderer } from "@/components/renderer/PresentationRenderer
 import { ChatPanel } from "@/components/workspace/ChatPanel";
 import type { PresentationConfig } from "@/lib/types";
 import { getPresentation, savePresentation } from "@/lib/store";
+import { Presentation, PenLine } from "lucide-react";
+import Link from "next/link";
 import sampleData from "@/lib/sample-presentation.json";
 
 export default function WorkspacePage() {
@@ -70,10 +72,30 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateColumns: "1fr 350px", backgroundColor: "var(--slide-bg)" }}>
+    <div className="w-screen h-screen overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr", gridTemplateColumns: "1fr 350px", backgroundColor: "var(--slide-bg)" }}>
+      {/* Workspace toolbar -- spans both columns */}
+      <div className="flex items-center justify-between px-4 py-2 border-b" style={{ gridColumn: "1 / -1", borderColor: "var(--slide-card-border)" }}>
+        <div className="flex items-center gap-3">
+          <PenLine size={16} style={{ color: "var(--slide-primary)" }} />
+          <span className="text-sm font-bold" style={{ fontFamily: "var(--slide-font-heading)" }}>
+            {config.title}
+          </span>
+          <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: "var(--slide-card-bg)", color: "var(--slide-text-muted)" }}>
+            Workspace
+          </span>
+        </div>
+        <Link
+          href={`/p/${id}/present`}
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-transform hover:scale-105"
+          style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}
+        >
+          <Presentation size={14} /> Present
+        </Link>
+      </div>
+
       {/* Preview */}
       <div className="relative overflow-hidden">
-        <PresentationRenderer config={config} onSlideChange={setCurrentSlideIndex} />
+        <PresentationRenderer config={config} onSlideChange={setCurrentSlideIndex} workspaceMode={true} />
       </div>
 
       {/* Chat Panel */}
