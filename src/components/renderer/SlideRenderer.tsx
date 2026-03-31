@@ -64,11 +64,12 @@ function buildSectionClasses(
 function SectionBadge({ id }: { id: string }) {
   return (
     <span
-      className="absolute -top-2 -left-2 z-20 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold leading-none"
+      className="absolute -top-3 -left-3 z-20 px-2.5 py-1 rounded-lg text-xs font-mono font-bold leading-none shadow-lg"
       style={{
         backgroundColor: "var(--slide-primary)",
         color: "var(--slide-bg)",
-        opacity: 0.8,
+        border: "2px solid var(--slide-bg)",
+        letterSpacing: "0.05em",
       }}
     >
       {id}

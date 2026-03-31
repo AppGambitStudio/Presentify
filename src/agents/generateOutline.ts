@@ -1,3 +1,4 @@
+import { parseJsonResponse } from "./parseResponse";
 import { getAnthropicClient } from "./client";
 import { OPUS_SYSTEM_PROMPT } from "./prompts";
 import type { IntakeFormData, OutlineItem } from "@/lib/types";
@@ -27,7 +28,7 @@ export async function generateOutline(intake: IntakeFormData): Promise<OutlineIt
   });
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("No text response from outline generation");
-  const outline: OutlineItem[] = JSON.parse(textBlock.text);
+  const outline: OutlineItem[] = parseJsonResponse(textBlock.text);
   if (!Array.isArray(outline) || outline.length === 0) throw new Error("Invalid outline format");
   return outline.map((item, i) => ({ number: i + 1, summary: item.summary }));
 }

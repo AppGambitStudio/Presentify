@@ -1,3 +1,4 @@
+import { parseJsonResponse } from "./parseResponse";
 import { getAnthropicClient } from "./client";
 import { SONNET_THEME_PROMPT } from "./prompts";
 import type { IntakeFormData, ThemeConfig } from "@/lib/types";
@@ -19,5 +20,5 @@ export async function generateTheme(intake: IntakeFormData): Promise<ThemeConfig
   });
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("No text response from theme generation");
-  return JSON.parse(textBlock.text) as ThemeConfig;
+  return parseJsonResponse<ThemeConfig>(textBlock.text);
 }

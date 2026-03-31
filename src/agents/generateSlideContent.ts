@@ -1,3 +1,4 @@
+import { parseJsonResponse } from "./parseResponse";
 import { getAnthropicClient } from "./client";
 import { buildSonnetSlidePrompt } from "./prompts";
 import type { OutlineItem, ThemeConfig, Slide } from "@/lib/types";
@@ -31,7 +32,7 @@ export async function generateSlideContent(
   });
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error(`No text response for slide ${outlineItem.number}`);
-  const slideData = JSON.parse(textBlock.text);
+  const slideData = parseJsonResponse(textBlock.text);
   return {
     number: outlineItem.number,
     summary: outlineItem.summary,

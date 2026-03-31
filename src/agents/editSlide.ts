@@ -1,3 +1,4 @@
+import { parseJsonResponse } from "./parseResponse";
 import { getAnthropicClient } from "./client";
 import { COMPONENT_REFERENCE } from "./componentReference";
 import type { Slide, PresentationConfig } from "@/lib/types";
@@ -49,7 +50,7 @@ Return the updated slide as JSON.`;
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("No response from edit agent");
 
-  const updated = JSON.parse(textBlock.text) as Slide;
+  const updated = parseJsonResponse<Slide>(textBlock.text);
   // Preserve id and number
   updated.id = currentSlide.id;
   updated.number = currentSlide.number;
