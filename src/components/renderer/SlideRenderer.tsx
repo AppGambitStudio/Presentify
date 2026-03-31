@@ -148,11 +148,11 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId, sectionInde
 
   if (section.type === "columns") {
     const colCount = section.columns.length;
-    const { className } = buildSectionWrapper(section.style, undefined, isFirstSlide);
+    const { className, wrapperStyle } = buildSectionWrapper(section.style, undefined, isFirstSlide);
     return (
       <div
         className={`relative w-full gap-5 md:gap-8 ${className}`}
-        style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+        style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)`, ...wrapperStyle }}
       >
         {showId && <SectionBadge id={sectionId} />}
         {section.columns.map((col, i) => (
