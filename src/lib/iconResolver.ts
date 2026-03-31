@@ -122,7 +122,9 @@ function toPascalCase(name: string): string {
  * Resolve an icon name to a Lucide React component.
  * Handles kebab-case, camelCase, PascalCase, and unknown names via fallback map.
  */
-export function resolveIcon(name: string): React.ComponentType<any> {
+export function resolveIcon(name: string | undefined | null): React.ComponentType<any> {
+  if (!name) return LucideIcons.Circle;
+
   // 1. Try direct PascalCase lookup
   const pascalName = toPascalCase(name);
   if ((LucideIcons as any)[pascalName]) {
