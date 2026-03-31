@@ -16,13 +16,19 @@ Example: title="AI + You = Superpowers", titleAccent="Superpowers"
 Sections flow top-to-bottom. Each section is either:
 
 **Full width:**
-{ "type": "full", "component": "ComponentName", "props": { ... } }
+{ "type": "full", "component": "ComponentName", "props": { ... }, "style": { ... } }
 
 **Multi-column:**
 { "type": "columns", "columns": [
   { "component": "ComponentName", "props": { ... } },
   { "component": "ComponentName", "props": { ... } }
-] }
+], "style": { ... } }
+
+**Section style (optional):**
+- glass: boolean -- wrap in glass panel (auto-applied for IconCard, CardGrid, ComparisonTable, NumberedSteps)
+- align: "left" | "center" | "right" -- text alignment override
+- accent: "#hex" -- left border accent color
+- spacing: "tight" | "normal" | "loose"
 
 ## Available Components
 

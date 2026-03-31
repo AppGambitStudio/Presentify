@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { Slide, Section, ComponentType } from "@/lib/types";
+import type { Slide, Section, SectionStyle, ComponentType } from "@/lib/types";
 import { componentRegistry } from "@/components/slides";
 
 interface SlideRendererProps {
@@ -14,21 +14,59 @@ function renderComponent(component: ComponentType, props: Record<string, any>) {
     console.warn(`Unknown component: ${component}`);
     return null;
   }
-  // Sanitize: if any prop value is an object with "component", skip it (AI artifact)
   const clean: Record<string, any> = {};
   for (const [k, v] of Object.entries(props)) {
-    if (v && typeof v === "object" && !Array.isArray(v) && v.component) {
-      continue; // skip nested component objects
-    }
+    if (v && typeof v === "object" && !Array.isArray(v) && v.component) continue;
     clean[k] = v;
   }
   return <Component {...clean} />;
 }
 
-function SectionRenderer({ section }: { section: Section }) {
+// Components that look better wrapped in glass-panel by default
+const GLASS_BY_DEFAULT = new Set(["IconCard", "CardGrid", "ComparisonTable", "NumberedSteps", "ShowcaseCard"]);
+
+function buildSectionClasses(
+  style: SectionStyle | undefined,
+  component: string | undefined,
+  isFirstSlide: boolean
+): { className: string; wrapperStyle: React.CSSProperties } {
+  const s = style || {};
+  const classes: string[] = [];
+  const wrapperStyle: React.CSSProperties = {};
+
+  // Alignment: inherit from section style, or center on first slide
+  const align = s.align || (isFirstSlide ? "center" : undefined);
+  if (align) classes.push(`text-${align}`);
+
+  // Glass panel: from section style, or default for certain components
+  if (s.glass || (s.glass === undefined && component && GLASS_BY_DEFAULT.has(component))) {
+    // Don't double-wrap -- the component itself may already be a glass panel (like IconCard)
+    // Only wrap in glass for ComparisonTable and NumberedSteps
+    if (component === "ComparisonTable" || component === "NumberedSteps") {
+      classes.push("glass-panel");
+    }
+  }
+
+  // Accent border
+  if (s.accent) {
+    wrapperStyle.borderLeft = `4px solid ${s.accent}`;
+    wrapperStyle.paddingLeft = "1.5rem";
+  }
+
+  // Spacing
+  if (s.spacing === "tight") classes.push("py-1");
+  else if (s.spacing === "loose") classes.push("py-4");
+
+  return { className: classes.join(" "), wrapperStyle };
+}
+
+function SectionRenderer({ section, isFirstSlide }: { section: Section; isFirstSlide: boolean }) {
   if (section.type === "full") {
+    const { className, wrapperStyle } = buildSectionClasses(
+      section.style, section.component, isFirstSlide
+    );
     return (
-      <div className="w-full">
+      <div className={className} style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}>
         {renderComponent(section.component, section.props)}
       </div>
     );
@@ -36,9 +74,10 @@ function SectionRenderer({ section }: { section: Section }) {
 
   if (section.type === "columns") {
     const colCount = section.columns.length;
+    const { className } = buildSectionClasses(section.style, undefined, isFirstSlide);
     return (
       <div
-        className="w-full gap-6 md:gap-8"
+        className={`w-full gap-5 md:gap-8 ${className}`}
         style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
       >
         {section.columns.map((col, i) => (
@@ -54,7 +93,6 @@ function SectionRenderer({ section }: { section: Section }) {
 }
 
 export function SlideRenderer({ slide }: SlideRendererProps) {
-  // Strip duplicate accent text from title
   let displayTitle = slide.title;
   if (slide.titleAccent) {
     const idx = displayTitle.lastIndexOf(slide.titleAccent);
@@ -63,14 +101,21 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
     }
   }
 
+  const isFirstSlide = slide.number === 1;
+  const isSparse = slide.sections.length <= 2;
+
   return (
     <div className="slide-content">
-      <div className="w-full flex-1 flex flex-col justify-center gap-6 overflow-hidden">
+      <div className={`w-full flex-1 flex flex-col justify-center overflow-hidden ${isSparse ? "gap-8 md:gap-10" : "gap-5 md:gap-7"}`}>
         {/* Title area */}
         {slide.title && (
           <div className="text-center">
             <h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight"
+              className={`font-bold leading-tight ${
+                isFirstSlide
+                  ? "text-4xl md:text-6xl lg:text-7xl"
+                  : "text-3xl md:text-4xl lg:text-5xl"
+              }`}
               style={{ fontFamily: "var(--slide-font-heading)" }}
             >
               {displayTitle}
@@ -79,7 +124,14 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
               )}
             </h1>
             {slide.subtitle && (
-              <p className="mt-3 text-lg md:text-xl" style={{ color: "var(--slide-text-muted)" }}>
+              <p
+                className={`${
+                  isFirstSlide
+                    ? "mt-5 text-xl md:text-2xl"
+                    : "mt-3 text-base md:text-xl"
+                }`}
+                style={{ color: "var(--slide-text-muted)" }}
+              >
                 {slide.subtitle}
               </p>
             )}
@@ -88,7 +140,7 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
 
         {/* Sections */}
         {slide.sections.map((section, i) => (
-          <SectionRenderer key={i} section={section} />
+          <SectionRenderer key={i} section={section} isFirstSlide={isFirstSlide} />
         ))}
       </div>
     </div>

@@ -41,6 +41,14 @@ export function isValidComponentType(type: string): type is ComponentType {
   return COMPONENT_TYPES.includes(type as ComponentType);
 }
 
+// --- Section Style (lightweight decoration on sections) ---
+export interface SectionStyle {
+  glass?: boolean;          // wrap in glass-panel
+  align?: "left" | "center" | "right";
+  accent?: string;          // left border accent color (hex)
+  spacing?: "tight" | "normal" | "loose";
+}
+
 // --- Section (content block within a slide) ---
 export interface SectionItem {
   component: ComponentType;
@@ -48,8 +56,8 @@ export interface SectionItem {
 }
 
 export type Section =
-  | { type: "full"; component: ComponentType; props: Record<string, any> }
-  | { type: "columns"; columns: SectionItem[] };
+  | { type: "full"; component: ComponentType; props: Record<string, any>; style?: SectionStyle }
+  | { type: "columns"; columns: SectionItem[]; style?: SectionStyle };
 
 // --- Slide ---
 export type SlideDecoration = "glow-pulse" | "rotating-icon" | "gradient-blob" | "shimmer";

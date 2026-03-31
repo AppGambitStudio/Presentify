@@ -38,14 +38,23 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
 }
 
 export function Body({ markdown }: BodyProps) {
+  // Split on double newlines for paragraphs, single newlines become <br/>
   const paragraphs = markdown.split("\n\n");
   return (
-    <div className="space-y-4" style={{ color: "var(--slide-text-muted)" }}>
-      {paragraphs.map((para, i) => (
-        <p key={i} className="text-xl leading-relaxed">
-          {parseInlineMarkdown(para)}
-        </p>
-      ))}
+    <div className="space-y-3" style={{ color: "var(--slide-text-muted)" }}>
+      {paragraphs.map((para, i) => {
+        const lines = para.split("\n");
+        return (
+          <p key={i} className="text-lg md:text-xl leading-relaxed">
+            {lines.map((line, j) => (
+              <React.Fragment key={j}>
+                {j > 0 && <br />}
+                {parseInlineMarkdown(line)}
+              </React.Fragment>
+            ))}
+          </p>
+        );
+      })}
     </div>
   );
 }
