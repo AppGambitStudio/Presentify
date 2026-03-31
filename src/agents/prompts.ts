@@ -48,33 +48,53 @@ Always respond with ONLY valid JSON, no markdown formatting or explanation.`;
 
 export function buildSonnetSlidePrompt(themeJson: string): string {
   return (
-    `You are an expert presentation content designer. Given a slide summary and theme, generate the slide content.\n\n` +
+    `You are a keynote presentation designer. You create slides for LIVE PRESENTATIONS -- not documents, not articles, not reports.\n\n` +
     COMPONENT_REFERENCE +
     `\nCurrent theme:\n` +
     themeJson +
     `\n\nGenerate a slide as a JSON object:
 {
-  "title": "Slide Title",
-  "titleAccent": "highlighted portion of title",
-  "subtitle": "optional subtitle",
+  "title": "Short Punchy Title",
+  "titleAccent": "highlighted word(s) at END of title",
+  "subtitle": "one-line context (optional)",
   "sections": [
-    { "type": "full", "component": "ComponentName", "props": { ... } },
-    { "type": "columns", "columns": [
-      { "component": "ComponentName", "props": { ... } },
-      { "component": "ComponentName", "props": { ... } }
-    ] }
+    { "type": "full", "component": "ComponentName", "props": { ... } }
   ],
-  "speakerNotes": "brief delivery hint",
+  "speakerNotes": "what to SAY (not what's on screen)",
   "decorations": []
 }
 
-Rules:
-- Keep content concise -- this is a presentation, not an essay
-- 2-4 sections max per slide
-- BulletList items under 10 words each
-- Use "columns" for side-by-side comparisons (2-3 columns max)
-- Don't use Heading component -- the title field handles headings
-- titleAccent must be a substring that appears at the END of title
+## PRESENTATION RULES (CRITICAL):
+
+**Content style:**
+- This is a KEYNOTE, not a document. People READ screens in 3 seconds.
+- Titles: 3-7 words max. Bold, punchy, memorable.
+- Subtitles: one short sentence max, or omit entirely.
+- BulletList items: 3-6 words each. Never full sentences. Never more than 5 items.
+- Body text: 1-2 short sentences max. If you need more, split into a BulletList.
+- StatCallout: use for ONE impressive number. Label under 5 words.
+- QuoteBlock: under 15 words. No paragraphs.
+- CTABox: one bold line + one supporting line max.
+
+**Structure:**
+- 1-3 sections per slide. Less is more.
+- Title slide (slide 1): title + subtitle + Body with speaker info. No bullet lists.
+- Content slides: title + 1-2 sections. Don't cram everything in.
+- Comparison slides: use "columns" with 2 columns max. Keep each column to 3-5 bullet items.
+- Closing slides: title + QuoteBlock or CTABox. Simple and memorable.
+
+**What NOT to do:**
+- Never write paragraphs. This is not an essay.
+- Never use more than 5 bullet items in a list.
+- Never make bullet items longer than 8 words.
+- Never use Body component for long text. If text is long, you're doing it wrong.
+- Never put more than 3 sections on one slide.
+- Never use Heading component in sections (title field handles this).
+- Never include emoji in titles.
+
+**titleAccent rule:** must be a substring at the END of title.
+  Good: title="AI is Your Superpower", titleAccent="Superpower"
+  Bad: title="AI is Your Superpower", titleAccent="AI is Your Superpower"
 
 Always respond with ONLY valid JSON, no markdown formatting or explanation.`
   );
