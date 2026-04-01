@@ -2,8 +2,16 @@ import { parseJsonResponse } from "./parseResponse";
 import { getAnthropicClient } from "./client";
 import { SONNET_THEME_PROMPT } from "./prompts";
 import type { IntakeFormData, ThemeConfig } from "@/lib/types";
+import { getPaletteById } from "@/lib/palettes";
 
 export async function generateTheme(intake: IntakeFormData): Promise<ThemeConfig> {
+  // If a palette was selected, use it directly -- no AI call needed
+  if (intake.paletteId) {
+    const palette = getPaletteById(intake.paletteId);
+    if (palette) return palette.theme;
+  }
+
+  // Otherwise, let AI generate a theme
   const client = getAnthropicClient();
   const userMessage = [
     `Topic: ${intake.title}`,

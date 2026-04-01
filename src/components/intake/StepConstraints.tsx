@@ -1,9 +1,24 @@
 "use client";
 import type { IntakeFormData } from "@/lib/types";
+import { PaletteSelector } from "@/components/workspace/PaletteSelector";
+import { PALETTES, type Palette } from "@/lib/palettes";
 
 interface Props { data: IntakeFormData; onChange: (data: Partial<IntakeFormData>) => void; }
 
 export function StepConstraints({ data, onChange }: Props) {
+  const selectedPalette = PALETTES.find(
+    (p) => p.theme.primaryColor === data.primaryColor && p.theme.accentColor === data.accentColor
+  );
+
+  const handlePaletteSelect = (palette: Palette) => {
+    onChange({
+      primaryColor: palette.theme.primaryColor,
+      accentColor: palette.theme.accentColor,
+      // Store palette ID for later use during generation
+      paletteId: palette.id,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -17,17 +32,28 @@ export function StepConstraints({ data, onChange }: Props) {
         </div>
       </div>
       <div>
-        <label className="block text-base font-medium mb-3" style={{ color: "var(--slide-text-muted)" }}>Brand Colors (optional)</label>
-        <div className="flex gap-6 items-center">
-          <div className="flex items-center gap-3">
-            <label className="text-base" style={{ color: "var(--slide-text-muted)" }}>Primary</label>
-            <input type="color" value={data.primaryColor || "#FF9900"} onChange={(e) => onChange({ primaryColor: e.target.value })} className="w-12 h-10 rounded-lg cursor-pointer bg-transparent border border-white/10" />
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="text-base" style={{ color: "var(--slide-text-muted)" }}>Accent</label>
-            <input type="color" value={data.accentColor || "#0073BB"} onChange={(e) => onChange({ accentColor: e.target.value })} className="w-12 h-10 rounded-lg cursor-pointer bg-transparent border border-white/10" />
-          </div>
-          <button onClick={() => onChange({ primaryColor: "", accentColor: "" })} className="text-base underline underline-offset-4" style={{ color: "var(--slide-text-muted)" }}>Let AI decide</button>
+        <label className="block text-base font-medium mb-3" style={{ color: "var(--slide-text-muted)" }}>
+          Color Theme
+        </label>
+        <p className="text-sm mb-4" style={{ color: "var(--slide-text-muted)" }}>
+          Pick a palette or let AI choose based on your topic
+        </p>
+        <PaletteSelector
+          selectedId={selectedPalette?.id}
+          onSelect={handlePaletteSelect}
+        />
+        <div className="flex gap-4 mt-4">
+          <button
+            onClick={() => onChange({ primaryColor: "", accentColor: "", paletteId: "" })}
+            className="text-sm px-4 py-2 rounded-lg transition-colors"
+            style={{
+              backgroundColor: !data.primaryColor ? "var(--slide-primary)" : "var(--slide-card-bg)",
+              color: !data.primaryColor ? "var(--slide-bg)" : "var(--slide-text-muted)",
+              border: "1px solid var(--slide-card-border)",
+            }}
+          >
+            Let AI decide
+          </button>
         </div>
       </div>
     </div>

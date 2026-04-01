@@ -6,10 +6,12 @@ import { PresentationRenderer } from "@/components/renderer/PresentationRenderer
 import { ChatPanel } from "@/components/workspace/ChatPanel";
 import type { PresentationConfig } from "@/lib/types";
 import { getPresentation, savePresentation } from "@/lib/store";
-import { Presentation, PenLine, HelpCircle } from "lucide-react";
+import { Presentation, PenLine, HelpCircle, Palette } from "lucide-react";
 import Link from "next/link";
 import sampleData from "@/lib/sample-presentation.json";
 import { SlideControls } from "@/components/workspace/SlideControls";
+import { PaletteSelector } from "@/components/workspace/PaletteSelector";
+import { PALETTES, type Palette as PaletteType } from "@/lib/palettes";
 import { WelcomeHints } from "@/components/workspace/WelcomeHints";
 
 export default function WorkspacePage() {
@@ -18,6 +20,7 @@ export default function WorkspacePage() {
   const [config, setConfig] = useState<PresentationConfig | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
 
   useEffect(() => {
     if (id === "sample") {
@@ -104,6 +107,28 @@ export default function WorkspacePage() {
         </div>
         <SlideControls config={config} currentSlideIndex={currentSlideIndex} onConfigUpdate={handleConfigUpdate} />
         <div className="flex items-center gap-3">
+          <div className="relative">
+            <button
+              onClick={() => setShowPalette(!showPalette)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors"
+              style={{ color: showPalette ? "var(--slide-primary)" : "var(--slide-text-muted)", border: "1px solid var(--slide-card-border)" }}
+            >
+              <Palette size={14} /> Theme
+            </button>
+            {showPalette && (
+              <div className="absolute top-full right-0 mt-2 p-3 rounded-xl shadow-2xl z-50 w-72" style={{ backgroundColor: "var(--slide-bg)", border: "1px solid var(--slide-card-border)" }}>
+                <p className="text-xs font-bold mb-2" style={{ color: "var(--slide-text-muted)" }}>Switch palette</p>
+                <PaletteSelector
+                  selectedId={PALETTES.find((p) => p.theme.primaryColor === config.theme.primaryColor && p.theme.backgroundColor === config.theme.backgroundColor)?.id}
+                  onSelect={(palette: PaletteType) => {
+                    handleConfigUpdate({ ...config, theme: palette.theme });
+                    setShowPalette(false);
+                  }}
+                  compact
+                />
+              </div>
+            )}
+          </div>
           <Link
             href="/help"
             target="_blank"

@@ -139,6 +139,7 @@ export interface IntakeFormData {
   donts: string;
   primaryColor: string;
   accentColor: string;
+  paletteId: string;           // selected palette ID (empty = let AI decide)
 }
 
 export interface OutlineItem {
