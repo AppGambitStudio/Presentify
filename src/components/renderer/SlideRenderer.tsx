@@ -1,16 +1,55 @@
 "use client";
 
-import React from "react";
-import type { Slide, Section, SectionStyle, ComponentType } from "@/lib/types";
+import React, { useEffect, useMemo, useState } from "react";
+import type {
+  Slide,
+  Section,
+  SectionStyle,
+  ComponentType,
+  SectionDetailLevel,
+} from "@/lib/types";
 import { componentRegistry } from "@/components/slides";
 import { EditProvider, useEdit } from "./EditContext";
 import { EditableText } from "./EditableText";
+
+export type DensityMode = SectionDetailLevel;
 
 interface SlideRendererProps {
   slide: Slide;
   showSectionIds?: boolean;
   workspaceMode?: boolean;
+  densityMode?: DensityMode;
   onSlideUpdate?: (updated: Slide) => void;
+}
+
+const DETAIL_ORDER: Record<SectionDetailLevel, number> = {
+  summary: 0,
+  standard: 1,
+  deep: 2,
+};
+
+const GAP_BY_DENSITY: Record<DensityMode, { sparse: string; dense: string }> = {
+  summary: { sparse: "1.5rem", dense: "1rem" },
+  standard: { sparse: "2rem", dense: "1.25rem" },
+  deep: { sparse: "2.5rem", dense: "1.75rem" },
+};
+
+function splitTitle(fullTitle: string, accent?: string) {
+  if (accent) {
+    const idx = fullTitle.lastIndexOf(accent);
+    if (idx >= 0 && idx + accent.length === fullTitle.length) {
+      return { base: fullTitle.slice(0, idx), accent };
+    }
+  }
+  return { base: fullTitle, accent: accent || "" };
+}
+
+function composeFullTitle(base: string, accent?: string) {
+  const trimmedBase = base.trimEnd();
+  const trimmedAccent = (accent || "").trim();
+  if (!trimmedBase) return trimmedAccent;
+  if (!trimmedAccent) return trimmedBase;
+  return `${trimmedBase} ${trimmedAccent}`;
 }
 
 function renderComponent(component: ComponentType, props: Record<string, any>, editable: boolean, onPropsChange?: (newProps: Record<string, any>) => void) {
@@ -117,10 +156,126 @@ function SectionBadge({ id }: { id: string }) {
   );
 }
 
-function SectionRenderer({ section, isFirstSlide, sectionId, showId, sectionIndex }: {
-  section: Section; isFirstSlide: boolean; sectionId: string; showId: boolean; sectionIndex: number;
+interface SectionChromeProps {
+  section: Section;
+  sectionId: string;
+  showId: boolean;
+  sectionIndex: number;
+  focusedSection: number | null;
+  onFocusToggle: (next: number | null) => void;
+  className?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}
+
+function SectionChrome({
+  section,
+  sectionId,
+  showId,
+  sectionIndex,
+  focusedSection,
+  onFocusToggle,
+  className,
+  style,
+  children,
+}: SectionChromeProps) {
+  const isFocused = focusedSection === sectionIndex;
+  const hasFocus = focusedSection !== null;
+  const detailLabel = section.detailLevel ? section.detailLevel.toUpperCase() : null;
+  const audienceLabels = section.audienceTags?.slice(0, 3) || [];
+
+  return (
+    <div
+      className={[
+        "relative group transition-all duration-300",
+        className,
+        isFocused ? "ring-2 ring-[var(--slide-primary)] shadow-2xl" : "",
+        hasFocus && !isFocused ? "opacity-40" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={style}
+    >
+      {showId && <SectionBadge id={sectionId} />}
+      <div
+        className="absolute top-3 right-3 flex gap-2 items-center text-[11px] uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ zIndex: 5 }}
+      >
+        {detailLabel && (
+          <span
+            className="px-2 py-0.5 rounded-full"
+            style={{
+              backgroundColor: "rgba(255,255,255,0.08)",
+              letterSpacing: "0.08em",
+            }}
+          >
+            {detailLabel}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onFocusToggle(isFocused ? null : sectionIndex);
+          }}
+          className="px-2 py-0.5 rounded-full border text-[10px] font-semibold"
+          style={{
+            borderColor: "var(--slide-card-border)",
+            backgroundColor: isFocused ? "var(--slide-primary)" : "rgba(0,0,0,0.35)",
+            color: isFocused ? "var(--slide-bg)" : "var(--slide-text)",
+          }}
+        >
+          {isFocused ? "Clear" : "Focus"}
+        </button>
+      </div>
+      {audienceLabels.length > 0 && (
+        <div
+          className="absolute top-3 left-3 flex flex-wrap gap-1 text-[10px] uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ zIndex: 5 }}
+        >
+          {audienceLabels.map((tag) => (
+            <span
+              key={tag}
+              className="px-1.5 py-0.5 rounded border"
+              style={{
+                borderColor: "rgba(255,255,255,0.15)",
+                color: "var(--slide-text-muted)",
+              }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+function SectionRenderer({
+  section,
+  isFirstSlide,
+  sectionId,
+  showId,
+  sectionIndex,
+  densityMode,
+  focusedSection,
+  onFocusToggle,
+  workspaceMode,
+}: {
+  section: Section;
+  isFirstSlide: boolean;
+  sectionId: string;
+  showId: boolean;
+  sectionIndex: number;
+  densityMode: DensityMode;
+  focusedSection: number | null;
+  onFocusToggle: (next: number | null) => void;
+  workspaceMode: boolean;
 }) {
   const { editable, onSectionUpdate } = useEdit();
+  const isEditable = editable && workspaceMode;
+  const densityAware = Boolean(section.detailLevel);
 
   const handlePropsChange = (newProps: Record<string, any>) => {
     if (section.type === "full") {
@@ -138,60 +293,114 @@ function SectionRenderer({ section, isFirstSlide, sectionId, showId, sectionInde
 
   if (section.type === "full") {
     const { className, wrapperStyle } = buildSectionWrapper(section.style, section.component, isFirstSlide);
+    const displayProps = transformComponentProps(
+      section.component,
+      section.props,
+      densityMode,
+      densityAware,
+      isEditable
+    );
     return (
-      <div className={`relative ${className}`} style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}>
-        {showId && <SectionBadge id={sectionId} />}
-        {renderComponent(section.component, section.props, editable, handlePropsChange)}
-      </div>
+      <SectionChrome
+        section={section}
+        sectionId={sectionId}
+        showId={showId}
+        sectionIndex={sectionIndex}
+        focusedSection={focusedSection}
+        onFocusToggle={onFocusToggle}
+        className={`relative ${className}`.trim()}
+        style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}
+      >
+        {renderComponent(section.component, displayProps, isEditable, handlePropsChange)}
+      </SectionChrome>
     );
   }
 
   if (section.type === "columns") {
     const colCount = section.columns.length;
     const { className, wrapperStyle } = buildSectionWrapper(section.style, undefined, isFirstSlide);
+    const layoutAware = densityAware || Boolean(section.dynamicLayout && section.dynamicLayout !== "auto");
+    const gridTemplate = layoutAware
+      ? getColumnTemplate(colCount, densityMode, section.dynamicLayout)
+      : `repeat(${colCount}, 1fr)`;
+    const columnGap = layoutAware ? (densityMode === "summary" ? "1rem" : densityMode === "deep" ? "2rem" : "1.25rem") : undefined;
     return (
-      <div
-        className={`relative w-full gap-5 md:gap-8 ${className}`}
-        style={{ display: "grid", gridTemplateColumns: `repeat(${colCount}, 1fr)`, ...wrapperStyle }}
+      <SectionChrome
+        section={section}
+        sectionId={sectionId}
+        showId={showId}
+        sectionIndex={sectionIndex}
+        focusedSection={focusedSection}
+        onFocusToggle={onFocusToggle}
+        className={`relative w-full ${layoutAware ? "" : "gap-5 md:gap-8"} ${className}`.trim()}
+        style={{ display: "grid", gridTemplateColumns: gridTemplate, gap: columnGap, ...wrapperStyle }}
       >
-        {showId && <SectionBadge id={sectionId} />}
         {section.columns.map((col, i) => {
           const colStyle = col.style ? buildSectionWrapper(col.style, col.component, isFirstSlide) : null;
+          const columnDensityAware = Boolean(col.detailLevel) || densityAware;
+          const displayProps = transformComponentProps(
+            col.component,
+            col.props,
+            densityMode,
+            columnDensityAware,
+            isEditable
+          );
           return (
             <div
               key={i}
               className={colStyle?.className || ""}
               style={colStyle?.wrapperStyle && Object.keys(colStyle.wrapperStyle).length > 0 ? colStyle.wrapperStyle : undefined}
             >
-              {renderComponent(col.component, col.props, editable, (newProps) => handleColumnPropsChange(i, newProps))}
+              {renderComponent(
+                col.component,
+                displayProps,
+                isEditable,
+                (newProps) => handleColumnPropsChange(i, newProps)
+              )}
             </div>
           );
         })}
-      </div>
+      </SectionChrome>
     );
   }
 
   return null;
 }
 
-export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = false, onSlideUpdate }: SlideRendererProps) {
-  let displayTitle = slide.title;
-  if (slide.titleAccent) {
-    const idx = displayTitle.lastIndexOf(slide.titleAccent);
-    if (idx >= 0 && idx + slide.titleAccent.length === displayTitle.length) {
-      displayTitle = displayTitle.slice(0, idx);
-    }
-  }
+export function SlideRenderer({
+  slide,
+  showSectionIds = false,
+  workspaceMode = false,
+  densityMode = "standard",
+  onSlideUpdate,
+}: SlideRendererProps) {
+  const { base: baseTitle, accent: accentValue } = useMemo(
+    () => splitTitle(slide.title, slide.titleAccent),
+    [slide.title, slide.titleAccent]
+  );
+  const displayTitle = baseTitle;
 
   const isFirstSlide = slide.number === 1;
-  const isSparse = slide.sections.length <= 2;
+  const visibleSections = useMemo(
+    () => slide.sections.filter((section) => shouldRenderSection(section, densityMode)),
+    [slide.sections, densityMode]
+  );
+  const isSparse = visibleSections.length <= 2;
   const editable = workspaceMode && !!onSlideUpdate;
+  const [focusedSection, setFocusedSection] = useState<number | null>(null);
+  useEffect(() => { setFocusedSection(null); }, [densityMode]);
 
   const handleTitleUpdate = (newTitle: string) => {
     if (onSlideUpdate) {
-      // Reconstruct full title with accent
-      const fullTitle = slide.titleAccent ? newTitle + slide.titleAccent : newTitle;
+      const fullTitle = composeFullTitle(newTitle, slide.titleAccent);
       onSlideUpdate({ ...slide, title: fullTitle });
+    }
+  };
+
+  const handleAccentUpdate = (newAccent: string) => {
+    if (onSlideUpdate) {
+      const fullTitle = composeFullTitle(displayTitle, newAccent);
+      onSlideUpdate({ ...slide, title: fullTitle, titleAccent: newAccent || undefined });
     }
   };
 
@@ -209,6 +418,9 @@ export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = f
     }
   };
 
+  const resolvedGap = slide.gap || (isSparse ? GAP_BY_DENSITY[densityMode].sparse : GAP_BY_DENSITY[densityMode].dense);
+  const hasVisibleSections = visibleSections.length > 0;
+
   return (
     <EditProvider
       editable={editable}
@@ -219,7 +431,7 @@ export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = f
       <div className="slide-content">
         <div
           className="w-full flex-1 flex flex-col justify-center overflow-hidden"
-          style={{ gap: slide.gap || (isSparse ? "2rem" : "1.25rem") }}
+          style={{ gap: resolvedGap }}
         >
           {/* Title area */}
           {slide.title && (
@@ -237,8 +449,21 @@ export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = f
                   onChange={handleTitleUpdate}
                   editable={editable}
                 />
-                {slide.titleAccent && (
-                  <span style={{ color: "var(--slide-primary)" }}>{slide.titleAccent}</span>
+                {(accentValue || editable) && (
+                  <>
+                    {" "}
+                    <EditableText
+                      value={accentValue}
+                      onChange={handleAccentUpdate}
+                      editable={editable}
+                      className="slide-title-accent inline-block"
+                      style={{
+                        color: "var(--slide-primary)",
+                        minWidth: !accentValue && editable ? "1ch" : undefined,
+                        opacity: !accentValue && editable ? 0.6 : 1,
+                      }}
+                    />
+                  </>
                 )}
               </h1>
               {slide.subtitle && (
@@ -255,18 +480,130 @@ export function SlideRenderer({ slide, showSectionIds = false, workspaceMode = f
           )}
 
           {/* Sections */}
-          {slide.sections.map((section, i) => (
-            <SectionRenderer
-              key={i}
-              section={section}
-              isFirstSlide={isFirstSlide}
-              sectionId={`S${i + 1}`}
-              showId={showSectionIds}
-              sectionIndex={i}
-            />
-          ))}
+          {slide.sections.map((section, i) =>
+            shouldRenderSection(section, densityMode) ? (
+              <SectionRenderer
+                key={i}
+                section={section}
+                isFirstSlide={isFirstSlide}
+                sectionId={`S${i + 1}`}
+                showId={showSectionIds}
+                sectionIndex={i}
+                densityMode={densityMode}
+                focusedSection={focusedSection}
+                onFocusToggle={setFocusedSection}
+                workspaceMode={workspaceMode}
+              />
+            ) : null
+          )}
+
+          {!hasVisibleSections && (
+            <div className="glass-panel text-center text-sm" style={{ color: "var(--slide-text-muted)" }}>
+              No content for this detail level. Switch modes to see more.
+            </div>
+          )}
         </div>
       </div>
     </EditProvider>
   );
+}
+
+function shouldRenderSection(section: Section, densityMode: DensityMode) {
+  const detail = section.detailLevel;
+  if (!detail) return true;
+  return DETAIL_ORDER[detail] <= DETAIL_ORDER[densityMode];
+}
+
+function getColumnTemplate(count: number, densityMode: DensityMode, layout: Section["dynamicLayout"]) {
+  if (layout === "stack") {
+    return "repeat(1, minmax(0, 1fr))";
+  }
+  if (layout === "grid") {
+    return `repeat(${Math.max(1, Math.min(3, count))}, minmax(0, 1fr))`;
+  }
+
+  const safeCount = Math.max(1, count);
+  if (densityMode === "summary") {
+    return "repeat(1, minmax(0, 1fr))";
+  }
+  if (densityMode === "deep") {
+    return `repeat(${Math.min(3, safeCount)}, minmax(0, 1fr))`;
+  }
+  return `repeat(${Math.min(2, safeCount)}, minmax(0, 1fr))`;
+}
+
+function transformComponentProps(
+  component: ComponentType,
+  props: Record<string, any>,
+  densityMode: DensityMode,
+  densityActive: boolean,
+  editable: boolean
+) {
+  if (!props || editable || !densityActive) return props;
+  switch (component) {
+    case "Body": {
+      if (typeof props.markdown !== "string") return props;
+      const limit = densityMode === "summary" ? 260 : densityMode === "standard" ? 480 : Infinity;
+      return limit === Infinity || props.markdown.length <= limit
+        ? props
+        : { ...props, markdown: truncateMarkdown(props.markdown, limit) };
+    }
+    case "BulletList": {
+      const items: string[] = props.items || [];
+      const limit = densityMode === "summary" ? 3 : densityMode === "standard" ? 6 : Infinity;
+      return limit === Infinity || items.length <= limit
+        ? props
+        : { ...props, items: [...items.slice(0, limit), "..."] };
+    }
+    case "NumberedSteps": {
+      const steps = props.steps || [];
+      const limit = densityMode === "summary" ? 3 : densityMode === "standard" ? 5 : Infinity;
+      return limit === Infinity || steps.length <= limit
+        ? props
+        : { ...props, steps: steps.slice(0, limit) };
+    }
+    case "CardGrid": {
+      const cards = props.cards || [];
+      const limit = densityMode === "summary" ? 3 : densityMode === "standard" ? 6 : cards.length;
+      const limitedCards = limit >= cards.length ? cards : cards.slice(0, limit);
+      const baseColumns = typeof props.columns === "number" && props.columns > 0 ? props.columns : Math.min(3, Math.max(1, limitedCards.length));
+      const columns = (() => {
+        if (densityMode === "summary") return Math.min(2, baseColumns);
+        if (densityMode === "deep") return Math.min(4, Math.max(baseColumns, Math.min(4, limitedCards.length)));
+        return baseColumns;
+      })();
+      return {
+        ...props,
+        cards: limitedCards,
+        columns,
+      };
+    }
+    case "TagList": {
+      const tags: string[] = props.tags || [];
+      const limit = densityMode === "summary" ? 6 : densityMode === "standard" ? 12 : tags.length;
+      return limit >= tags.length
+        ? props
+        : { ...props, tags: [...tags.slice(0, limit), "..."] };
+    }
+    case "ComparisonTable": {
+      const rows = props.rows || [];
+      const limit = densityMode === "summary" ? 2 : densityMode === "standard" ? 4 : rows.length;
+      return { ...props, rows: rows.slice(0, limit) };
+    }
+    case "ChartBlock": {
+      const data = props.data || [];
+      const limit = densityMode === "summary" ? 4 : densityMode === "standard" ? 6 : data.length;
+      return limit >= data.length ? props : { ...props, data: data.slice(0, limit) };
+    }
+    default:
+      return props;
+  }
+}
+
+function truncateMarkdown(markdown: string, limit: number) {
+  if (markdown.length <= limit) return markdown;
+  const truncated = markdown.slice(0, limit).trimEnd();
+  const lastSentence = truncated.lastIndexOf(". ");
+  const cutoff = lastSentence > limit * 0.6 ? lastSentence + 1 : truncated.length;
+  return `${truncated.slice(0, cutoff).trimEnd()} ...`;
 }

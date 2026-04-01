@@ -54,15 +54,23 @@ export interface SectionStyle {
 }
 
 // --- Section (content block within a slide) ---
-export interface SectionItem {
+export type SectionDetailLevel = "summary" | "standard" | "deep";
+
+interface SectionMeta {
+  style?: SectionStyle;
+  detailLevel?: SectionDetailLevel;
+  audienceTags?: string[];
+  dynamicLayout?: "auto" | "stack" | "grid";
+}
+
+export interface SectionItem extends SectionMeta {
   component: ComponentType;
   props: Record<string, any>;
-  style?: SectionStyle;
 }
 
 export type Section =
-  | { type: "full"; component: ComponentType; props: Record<string, any>; style?: SectionStyle }
-  | { type: "columns"; columns: SectionItem[]; style?: SectionStyle };
+  | ({ type: "full"; component: ComponentType; props: Record<string, any> } & SectionMeta)
+  | ({ type: "columns"; columns: SectionItem[] } & SectionMeta);
 
 // --- Slide ---
 export type SlideDecoration = "glow-pulse" | "rotating-icon" | "gradient-blob" | "shimmer";

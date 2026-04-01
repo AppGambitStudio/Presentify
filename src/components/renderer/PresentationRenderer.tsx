@@ -8,6 +8,7 @@ import type { PresentationConfig, Slide } from "@/lib/types";
 import { SlideEditor } from "./SlideEditor";
 import { ThemeProvider } from "./ThemeProvider";
 import { SlideRenderer } from "./SlideRenderer";
+import type { DensityMode } from "./SlideRenderer";
 import { SlideDecorations } from "./SlideDecorations";
 import { ProgressBar } from "./ProgressBar";
 
@@ -31,6 +32,14 @@ const slideVariants = {
   }),
 };
 
+const DENSITY_STORAGE_KEY = "presentify:density-mode";
+const DENSITY_OPTIONS: DensityMode[] = ["summary", "standard", "deep"];
+const DENSITY_LABELS: Record<DensityMode, string> = {
+  summary: "Summary",
+  standard: "Standard",
+  deep: "Deep Dive",
+};
+
 interface PresentationRendererProps {
   config: PresentationConfig;
   onSlideChange?: (index: number) => void;
@@ -46,7 +55,21 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
+  const [densityMode, setDensityMode] = useState<DensityMode>("standard");
   const totalSlides = config.slides.length;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(DENSITY_STORAGE_KEY);
+    if (stored && DENSITY_OPTIONS.includes(stored as DensityMode)) {
+      setDensityMode(stored as DensityMode);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(DENSITY_STORAGE_KEY, densityMode);
+  }, [densityMode]);
 
   const nextSlide = useCallback(() => {
     if (currentSlide < totalSlides - 1) {
@@ -132,7 +155,13 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
               className="absolute inset-0 w-full h-full"
             >
               <SlideDecorations decorations={slide.decorations} />
-              <SlideRenderer slide={slide} showSectionIds={workspaceMode} workspaceMode={workspaceMode} onSlideUpdate={handleSlideUpdate} />
+              <SlideRenderer
+                slide={slide}
+                showSectionIds={workspaceMode}
+                workspaceMode={workspaceMode}
+                densityMode={densityMode}
+                onSlideUpdate={handleSlideUpdate}
+              />
             </motion.div>
           </AnimatePresence>
         </main>
@@ -145,7 +174,26 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
         )}
 
         {/* Navigation -- row 3 */}
-        <nav className="flex justify-center items-center gap-4 py-3 z-50">
+        <nav className="flex flex-wrap justify-center items-center gap-4 py-3 z-50">
+          <div
+            className="flex items-center gap-1 px-2 py-1 rounded-full border"
+            style={{ borderColor: "var(--slide-card-border)", backgroundColor: "rgba(0,0,0,0.25)" }}
+          >
+            {DENSITY_OPTIONS.map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setDensityMode(mode)}
+                className="px-3 py-1 rounded-full text-xs font-semibold transition-colors"
+                style={{
+                  backgroundColor: densityMode === mode ? "var(--slide-primary)" : "transparent",
+                  color: densityMode === mode ? "var(--slide-bg)" : "var(--slide-text-muted)",
+                }}
+              >
+                {DENSITY_LABELS[mode]}
+              </button>
+            ))}
+          </div>
           <button onClick={prevSlide} disabled={currentSlide === 0} className="p-3 rounded-full disabled:opacity-20 transition-all" style={{ backgroundColor: "var(--slide-card-bg)", border: "1px solid var(--slide-card-border)" }}>
             <ChevronLeft size={20} />
           </button>
