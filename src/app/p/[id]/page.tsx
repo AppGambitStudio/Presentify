@@ -66,7 +66,16 @@ export default function WorkspacePage() {
       setConfig(newConfig);
       savePresentation(newConfig);
 
-      return `Updated slide ${updatedSlide.number}: "${updatedSlide.title}"`;
+      // Friendly description of what changed
+      const oldSlide = config.slides[currentSlideIndex];
+      const changes: string[] = [];
+      if (oldSlide.title !== updatedSlide.title) changes.push("title");
+      if (oldSlide.subtitle !== updatedSlide.subtitle) changes.push("subtitle");
+      if (JSON.stringify(oldSlide.sections) !== JSON.stringify(updatedSlide.sections)) changes.push("content");
+      if (JSON.stringify(oldSlide.style) !== JSON.stringify(updatedSlide.style)) changes.push("styling");
+      if (oldSlide.gap !== updatedSlide.gap) changes.push("spacing");
+      const changeDesc = changes.length > 0 ? `Changed: ${changes.join(", ")}` : "Applied your changes";
+      return `✓ Slide ${updatedSlide.number} updated — ${changeDesc}`;
     } finally {
       setIsEditing(false);
     }
