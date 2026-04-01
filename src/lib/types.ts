@@ -140,11 +140,16 @@ export interface IntakeFormData {
   primaryColor: string;
   accentColor: string;
   paletteId: string;           // selected palette ID (empty = let AI decide)
+  maxSlides: number;           // 0 = auto (based on duration), otherwise cap
 }
 
 export interface OutlineItem {
   number: number;
   summary: string;
+  keyMessage?: string;        // the ONE thing the audience should remember
+  talkingPoints?: string[];   // 3-5 specific points/facts for this slide
+  suggestedComponents?: string; // hint for Sonnet: "StatCallout + CardGrid" or "two-column BulletList"
+  tone?: string;              // per-slide tone override: "humorous", "serious", "inspiring"
 }
 
 export type GenerationPhase =

@@ -17,7 +17,7 @@ const STEPS = [
 const DEFAULT_FORM: IntakeFormData = {
   title: "", speakerName: "", speakerRole: "", speakerOrganization: "",
   audience: "", purpose: "", duration: 20, tone: [], keyPoints: "",
-  paletteId: "",
+  paletteId: "", maxSlides: 0,
   dos: "", donts: "", primaryColor: "", accentColor: "",
 };
 

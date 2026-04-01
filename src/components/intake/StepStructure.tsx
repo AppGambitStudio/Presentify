@@ -37,6 +37,26 @@ export function StepStructure({ data, onChange }: Props) {
         <label className="block text-base font-medium mb-2" style={{ color: "var(--slide-text-muted)" }}>Key points to cover</label>
         <textarea value={data.keyPoints} onChange={(e) => onChange({ keyPoints: e.target.value })} placeholder="e.g. AI integration patterns, AWS Free Tier, building vs learning" rows={3} className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-[var(--slide-primary)] transition-colors resize-none" />
       </div>
+      <div>
+        <label className="block text-base font-medium mb-3" style={{ color: "var(--slide-text-muted)" }}>Max slides (optional)</label>
+        <div className="flex items-center gap-3">
+          {[0, 8, 12, 16, 20, 25].map((n) => (
+            <button
+              key={n}
+              onClick={() => onChange({ maxSlides: n })}
+              className="px-4 py-2 rounded-xl border transition-all text-sm font-medium"
+              style={{
+                backgroundColor: data.maxSlides === n ? "var(--slide-primary)" : "transparent",
+                borderColor: data.maxSlides === n ? "var(--slide-primary)" : "var(--slide-card-border)",
+                color: data.maxSlides === n ? "var(--slide-bg)" : "var(--slide-text)",
+              }}
+            >
+              {n === 0 ? "Auto" : n}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs mt-2" style={{ color: "var(--slide-text-muted)" }}>Auto adjusts based on duration. Set a limit to keep your deck focused.</p>
+      </div>
     </div>
   );
 }

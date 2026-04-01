@@ -12,18 +12,40 @@ export async function generateSlideContent(
 ): Promise<Omit<Slide, "id">> {
   const client = getAnthropicClient();
   const themeJson = JSON.stringify(theme, null, 2);
-  const userMessage = [
+
+  // Build a rich context message with all the detail Opus provided
+  const lines = [
     `Presentation: "${intake.title}"`,
     `Audience: ${intake.audience}`,
-    `Tone: ${intake.tone.join(", ")}`,
+    `Overall tone: ${intake.tone.join(", ")}`,
     `Purpose: ${intake.purpose}`,
     ``,
-    `This is slide ${outlineItem.number} of ${totalSlides}.`,
-    `Slide summary: "${outlineItem.summary}"`,
-    ``,
-    `Full outline for context:`,
-    ...allSummaries.map((s, i) => `  ${i + 1}. ${s}${i + 1 === outlineItem.number ? " <-- THIS SLIDE" : ""}`),
-  ].join("\n");
+    `--- THIS SLIDE (${outlineItem.number} of ${totalSlides}) ---`,
+    `Summary: ${outlineItem.summary}`,
+  ];
+
+  if (outlineItem.keyMessage) {
+    lines.push(`Key message (the ONE thing audience remembers): ${outlineItem.keyMessage}`);
+  }
+  if (outlineItem.talkingPoints && outlineItem.talkingPoints.length > 0) {
+    lines.push(`Talking points (USE these specific facts/examples):`);
+    outlineItem.talkingPoints.forEach((tp) => lines.push(`  • ${tp}`));
+  }
+  if (outlineItem.suggestedComponents) {
+    lines.push(`Suggested visual structure: ${outlineItem.suggestedComponents}`);
+  }
+  if (outlineItem.tone) {
+    lines.push(`This slide's tone: ${outlineItem.tone}`);
+  }
+
+  lines.push(``);
+  lines.push(`Full outline for narrative context:`);
+  allSummaries.forEach((s, i) => {
+    lines.push(`  ${i + 1}. ${s}${i + 1 === outlineItem.number ? " ◀ YOU ARE HERE" : ""}`);
+  });
+
+  const userMessage = lines.join("\n");
+
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 2048,
