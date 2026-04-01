@@ -31,12 +31,18 @@ export function BulletList({ items, icon, variant = "default", color, __editable
   const textOpacity = isMuted ? 0.6 : 1;
   const iconColor = isMuted ? "var(--slide-text-muted)" : accentColor;
 
+  // Auto-compact: tighter spacing when many items
+  const isCompact = items.length > 5;
+  const spacing = isCompact ? "space-y-2" : "space-y-4";
+  const textSize = isCompact ? "text-base" : "text-lg";
+  const iconSize = isCompact ? 16 : 20;
+
   return (
-    <ul className="space-y-4" style={{ width: "fit-content" }}>
+    <ul className={spacing} style={{ width: "fit-content" }}>
       {items.map((item, i) => (
         <li
           key={i}
-          className="flex items-start gap-3 text-lg"
+          className={`flex items-start gap-3 ${textSize}`}
           style={{ color: textColor, opacity: textOpacity }}
         >
           {/* Icon/bullet */}
@@ -50,7 +56,7 @@ export function BulletList({ items, icon, variant = "default", color, __editable
           ) : isMuted ? (
             <Minus size={18} className="shrink-0 mt-1" style={{ color: iconColor, opacity: 0.4 }} />
           ) : Icon ? (
-            <Icon size={20} className="shrink-0 mt-1" style={{ color: iconColor }} />
+            <Icon size={iconSize} className="shrink-0 mt-1" style={{ color: iconColor }} />
           ) : (
             <span className="shrink-0 mt-2 w-2 h-2 rounded-full" style={{ backgroundColor: iconColor }} />
           )}

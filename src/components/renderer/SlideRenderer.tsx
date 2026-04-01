@@ -436,6 +436,31 @@ export function SlideRenderer({
   const resolvedGap = slide.gap || (isSparse ? GAP_BY_DENSITY[densityMode].sparse : GAP_BY_DENSITY[densityMode].dense);
   const hasVisibleSections = visibleSections.length > 0;
 
+  // Auto-scale: shrink content if it overflows the container
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const [contentScale, setContentScale] = useState(1);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const content = contentRef.current;
+    if (!container || !content) return;
+
+    const check = () => {
+      const containerH = container.clientHeight;
+      const contentH = content.scrollHeight;
+      if (contentH > containerH && containerH > 0) {
+        setContentScale(Math.max(0.55, containerH / contentH));
+      } else {
+        setContentScale(1);
+      }
+    };
+
+    check();
+    const timer = setTimeout(check, 200);
+    return () => clearTimeout(timer);
+  }, [slide.id, slide.sections, densityMode]);
+
   return (
     <EditProvider
       editable={editable}
@@ -458,9 +483,16 @@ export function SlideRenderer({
         {slide.style?.overlay && (
           <div className="absolute inset-0 z-0" style={{ backgroundColor: slide.style.overlay }} />
         )}
+        <div ref={containerRef} className="w-full flex-1 overflow-hidden relative z-10">
         <div
-          className="w-full flex-1 flex flex-col justify-center overflow-hidden relative z-10"
-          style={{ gap: resolvedGap }}
+          ref={contentRef}
+          className="w-full flex flex-col justify-center"
+          style={{
+            gap: resolvedGap,
+            transform: contentScale < 1 ? `scale(${contentScale})` : undefined,
+            transformOrigin: "top center",
+            minHeight: contentScale < 1 ? undefined : "100%",
+          }}
         >
           {/* Title area */}
           {slide.title && (
@@ -531,6 +563,7 @@ export function SlideRenderer({
               No content for this detail level. Switch modes to see more.
             </div>
           )}
+        </div>
         </div>
         </div>
     </EditProvider>
