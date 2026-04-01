@@ -78,7 +78,7 @@ export function GenerationView() {
               case "config":
                 savePresentation(data as PresentationConfig);
                 setPhase("complete");
-                router.push(`/p/${(data as PresentationConfig).id}/present`);
+                router.push(`/p/${(data as PresentationConfig).id}`);
                 break;
               case "error": throw new Error(data.message);
             }
