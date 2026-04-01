@@ -192,7 +192,7 @@ function SectionChrome({
       className={[
         "relative group transition-all duration-300",
         className,
-        isFocused ? "ring-2 ring-[var(--slide-primary)] shadow-2xl" : "",
+        isFocused ? "ring-2 ring-[var(--slide-primary)] shadow-2xl !overflow-visible" : "",
         hasFocus && !isFocused ? "opacity-40" : "",
       ]
         .filter(Boolean)
@@ -251,9 +251,9 @@ function SectionChrome({
         </div>
       )}
       {children}
-      {/* Section toolbar -- appears when focused, rendered OUTSIDE overflow hidden via portal-like fixed positioning */}
+      {/* Section toolbar -- top-right of focused section */}
       {isFocused && onStyleChange && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100]">
+        <div className="absolute -top-9 right-0 z-30">
           <SectionToolbar style={section.style} onChange={onStyleChange} />
         </div>
       )}
