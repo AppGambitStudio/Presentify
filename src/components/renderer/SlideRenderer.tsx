@@ -251,9 +251,9 @@ function SectionChrome({
         </div>
       )}
       {children}
-      {/* Section toolbar -- appears when focused */}
+      {/* Section toolbar -- appears when focused, rendered OUTSIDE overflow hidden via portal-like fixed positioning */}
       {isFocused && onStyleChange && (
-        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-30">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[100]">
           <SectionToolbar style={section.style} onChange={onStyleChange} />
         </div>
       )}
