@@ -1,7 +1,8 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2, MessageSquare, Presentation } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize, Minimize, Code2, MessageSquare, Presentation, Home } from "lucide-react";
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { savePresentation } from "@/lib/store";
 import type { PresentationConfig, Slide } from "@/lib/types";
@@ -133,7 +134,12 @@ export function PresentationRenderer({ config: initialConfig, onSlideChange, wor
       <div className="w-full h-full overflow-hidden" style={{ display: "grid", gridTemplateRows: "auto 1fr auto auto", gridTemplateColumns: showEditor ? "60fr 40fr" : "1fr" }}>
         {/* Header -- row 1 */}
         <header className="px-6 py-4 flex justify-between items-center z-50" style={{ gridColumn: "1 / -1" }}>
-          <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="p-1.5 rounded-lg transition-colors" style={{ color: "var(--slide-text-muted)" }} title="Back to home">
+              <Home size={18} />
+            </Link>
+            <span className="font-bold text-lg" style={{ fontFamily: "var(--slide-font-heading)" }}>{config.title}</span>
+          </div>
           <span className="text-sm" style={{ color: "var(--slide-text-muted)" }}>{currentSlide + 1} / {totalSlides}</span>
         </header>
 
