@@ -10,6 +10,7 @@ import { Presentation, PenLine, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import sampleData from "@/lib/sample-presentation.json";
 import { SlideControls } from "@/components/workspace/SlideControls";
+import { WelcomeHints } from "@/components/workspace/WelcomeHints";
 
 export default function WorkspacePage() {
   const params = useParams();
@@ -123,6 +124,7 @@ export default function WorkspacePage() {
         isLoading={isEditing}
         slideNumber={config.slides[currentSlideIndex]?.number || 1}
       />
+      <WelcomeHints />
     </div>
   );
 }
