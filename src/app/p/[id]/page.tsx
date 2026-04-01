@@ -116,17 +116,45 @@ export default function WorkspacePage() {
               <Palette size={14} /> Theme
             </button>
             {showPalette && (
-              <div className="absolute top-full right-0 mt-2 p-3 rounded-xl shadow-2xl z-50 w-72" style={{ backgroundColor: "var(--slide-bg)", border: "1px solid var(--slide-card-border)" }}>
-                <p className="text-xs font-bold mb-2" style={{ color: "var(--slide-text-muted)" }}>Switch palette</p>
-                <PaletteSelector
-                  selectedId={PALETTES.find((p) => p.theme.primaryColor === config.theme.primaryColor && p.theme.backgroundColor === config.theme.backgroundColor)?.id}
-                  onSelect={(palette: PaletteType) => {
-                    handleConfigUpdate({ ...config, theme: palette.theme });
-                    setShowPalette(false);
-                  }}
-                  compact
-                />
-              </div>
+              <>
+                {/* Backdrop to close */}
+                <div className="fixed inset-0 z-[90]" onClick={() => setShowPalette(false)} />
+                <div className="fixed z-[100] p-4 rounded-xl shadow-2xl" style={{
+                  top: "50px", right: "200px",
+                  backgroundColor: "var(--slide-bg)",
+                  border: "1px solid var(--slide-card-border)",
+                  minWidth: "320px",
+                }}>
+                  <p className="text-xs font-bold mb-3" style={{ color: "var(--slide-text-muted)" }}>Switch palette</p>
+                  <div className="grid grid-cols-5 gap-2">
+                    {PALETTES.map((p) => {
+                      const isSelected = config.theme.primaryColor === p.theme.primaryColor && config.theme.backgroundColor === p.theme.backgroundColor;
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => {
+                            handleConfigUpdate({ ...config, theme: p.theme });
+                            setShowPalette(false);
+                          }}
+                          title={p.name}
+                          className="flex flex-col items-center gap-1 p-2 rounded-lg transition-all hover:scale-105"
+                          style={{
+                            backgroundColor: isSelected ? "var(--slide-card-bg)" : "transparent",
+                            border: isSelected ? `2px solid ${p.preview[1]}` : "2px solid transparent",
+                          }}
+                        >
+                          <div className="flex gap-1">
+                            {p.preview.map((c, i) => (
+                              <div key={i} className="w-4 h-4 rounded-full" style={{ backgroundColor: c, border: "1px solid rgba(128,128,128,0.3)" }} />
+                            ))}
+                          </div>
+                          <span className="text-[10px]" style={{ color: "var(--slide-text-muted)" }}>{p.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
             )}
           </div>
           <Link
