@@ -11,6 +11,7 @@ import type {
 import { componentRegistry } from "@/components/slides";
 import { EditProvider, useEdit } from "./EditContext";
 import { EditableText } from "./EditableText";
+import { SectionToolbar } from "./SectionToolbar";
 
 export type DensityMode = SectionDetailLevel;
 
@@ -163,6 +164,7 @@ interface SectionChromeProps {
   sectionIndex: number;
   focusedSection: number | null;
   onFocusToggle: (next: number | null) => void;
+  onStyleChange?: (style: SectionStyle) => void;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -175,6 +177,7 @@ function SectionChrome({
   sectionIndex,
   focusedSection,
   onFocusToggle,
+  onStyleChange,
   className,
   style,
   children,
@@ -248,6 +251,12 @@ function SectionChrome({
         </div>
       )}
       {children}
+      {/* Section toolbar -- appears when focused */}
+      {isFocused && onStyleChange && (
+        <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-30">
+          <SectionToolbar style={section.style} onChange={onStyleChange} />
+        </div>
+      )}
     </div>
   );
 }
@@ -283,6 +292,10 @@ function SectionRenderer({
     }
   };
 
+  const handleStyleChange = (newStyle: SectionStyle) => {
+    onSectionUpdate(sectionIndex, { ...section, style: newStyle });
+  };
+
   const handleColumnPropsChange = (colIndex: number, newProps: Record<string, any>) => {
     if (section.type === "columns") {
       const newColumns = [...section.columns];
@@ -308,6 +321,7 @@ function SectionRenderer({
         sectionIndex={sectionIndex}
         focusedSection={focusedSection}
         onFocusToggle={onFocusToggle}
+        onStyleChange={isEditable ? handleStyleChange : undefined}
         className={`relative ${className}`.trim()}
         style={Object.keys(wrapperStyle).length > 0 ? wrapperStyle : undefined}
       >
@@ -332,6 +346,7 @@ function SectionRenderer({
         sectionIndex={sectionIndex}
         focusedSection={focusedSection}
         onFocusToggle={onFocusToggle}
+        onStyleChange={isEditable ? handleStyleChange : undefined}
         className={`relative w-full ${layoutAware ? "" : "gap-5 md:gap-8"} ${className}`.trim()}
         style={{ display: "grid", gridTemplateColumns: gridTemplate, gap: columnGap, ...wrapperStyle }}
       >
