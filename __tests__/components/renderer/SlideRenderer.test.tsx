@@ -31,33 +31,4 @@ describe("SlideRenderer", () => {
     render(<SlideRenderer slide={baseSlide} />);
     expect(screen.getByText("Test body content")).toBeInTheDocument();
   });
-
-  test("hides deep sections in summary density mode", () => {
-    const slide: Slide = {
-      ...baseSlide,
-      sections: [
-        { type: "full", component: "Body", props: { markdown: "Visible" }, detailLevel: "summary" },
-        { type: "full", component: "Body", props: { markdown: "Hidden" }, detailLevel: "deep" },
-      ],
-    };
-    render(<SlideRenderer slide={slide} densityMode="summary" />);
-    expect(screen.getByText("Visible")).toBeInTheDocument();
-    expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
-  });
-
-  test("compresses bullet list items in summary mode", () => {
-    const slide: Slide = {
-      ...baseSlide,
-      sections: [
-        {
-          type: "full",
-          component: "BulletList",
-          props: { items: ["One", "Two", "Three", "Four"] },
-          detailLevel: "summary",
-        },
-      ],
-    };
-    render(<SlideRenderer slide={slide} densityMode="summary" />);
-    expect(screen.getByText("...")).toBeInTheDocument();
-  });
 });

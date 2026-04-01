@@ -1,33 +1,61 @@
 import { resolveIcon } from "@/lib/iconResolver";
 import { parseInlineMarkdown } from "@/lib/parseMarkdown";
+import { Minus } from "lucide-react";
 
 interface BulletListProps {
   items: string[];
   icon?: string;
+  variant?: "default" | "muted" | "highlighted" | "numbered";
+  color?: string;            // hex color for icons/bullets
   __editable?: boolean;
   __onPropsChange?: (props: Record<string, any>) => void;
 }
 
-export function BulletList({ items, icon, __editable, __onPropsChange }: BulletListProps) {
+export function BulletList({ items, icon, variant = "default", color, __editable, __onPropsChange }: BulletListProps) {
   const Icon = icon ? resolveIcon(icon) : null;
+  const accentColor = color || "var(--slide-primary)";
 
   const handleItemBlur = (index: number, newText: string) => {
     if (__onPropsChange && newText !== items[index]) {
       const newItems = [...items];
       newItems[index] = newText;
-      __onPropsChange({ items: newItems, icon });
+      __onPropsChange({ items: newItems, icon, variant, color });
     }
   };
 
+  const isMuted = variant === "muted";
+  const isHighlighted = variant === "highlighted";
+  const isNumbered = variant === "numbered";
+
+  const textColor = isMuted ? "var(--slide-text-muted)" : isHighlighted ? "var(--slide-text)" : "var(--slide-text-muted)";
+  const textOpacity = isMuted ? 0.6 : 1;
+  const iconColor = isMuted ? "var(--slide-text-muted)" : accentColor;
+
   return (
-    <ul className="space-y-5" style={{ width: "fit-content" }}>
+    <ul className="space-y-4" style={{ width: "fit-content" }}>
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-4 text-xl" style={{ color: "var(--slide-text-muted)" }}>
-          {Icon ? (
-            <Icon size={22} className="shrink-0 mt-1" style={{ color: "var(--slide-primary)" }} />
+        <li
+          key={i}
+          className="flex items-start gap-3 text-lg"
+          style={{ color: textColor, opacity: textOpacity }}
+        >
+          {/* Icon/bullet */}
+          {isNumbered ? (
+            <span
+              className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-0.5"
+              style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
+            >
+              {i + 1}
+            </span>
+          ) : isMuted ? (
+            <Minus size={18} className="shrink-0 mt-1" style={{ color: iconColor, opacity: 0.4 }} />
+          ) : Icon ? (
+            <Icon size={20} className="shrink-0 mt-1" style={{ color: iconColor }} />
           ) : (
-            <span className="shrink-0 mt-2.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "var(--slide-primary)" }} />
+            <span className="shrink-0 mt-2 w-2 h-2 rounded-full" style={{ backgroundColor: iconColor }} />
           )}
+
+          {/* Text */}
           {__editable ? (
             <span
               contentEditable

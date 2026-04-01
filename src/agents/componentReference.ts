@@ -39,13 +39,13 @@ Sections flow top-to-bottom. Each section is either:
 
 | Component | Props | Use For |
 |-----------|-------|---------|
-| Body | markdown (supports **bold**, *italic*) | Paragraphs, descriptions |
-| BulletList | items[], icon? (lucide name) | Lists of points |
+| Body | markdown, variant? ("default"/"callout"/"quote"), accentColor? (hex) | Paragraphs. "callout" = dark bg + left border. "quote" = italic + muted border. |
+| BulletList | items[], icon? (lucide), variant? ("default"/"muted"/"highlighted"/"numbered"), color? (hex) | Lists. "muted" = gray dashes, dimmed. "highlighted" = bright text. "numbered" = numbered circles. |
 | NumberedSteps | steps[{title, desc}], style? ("compact"/"hero") | Step-by-step processes |
 | ComparisonTable | headers[], rows[][] | Side-by-side comparisons |
 | StatCallout | value, label, color? (hex only e.g. "#FF9900") | Big numbers, stats |
 | QuoteBlock | text, attribution? | Quotes, key messages |
-| IconCard | icon? (lucide name), title, desc, color? (hex), layout? ("vertical"/"horizontal") | Feature cards. Omit icon for plain card. Use layout "horizontal" for compact side-by-side. |
+| IconCard | icon?, title, desc, color? (hex), layout? ("vertical"/"horizontal"), align?, action?, tags?[], footer? | Cards. action = highlighted CTA line. tags = badge array. footer = muted note. Color tints icon AND title. |
 | CardGrid | cards[{icon, title, desc, color? (hex)}], columns? | Grid of cards |
 | CTABox | text (newline for multi-line), color? (hex only) | Call-to-action |
 | CodeBlock | code, language? | Code samples |

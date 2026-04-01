@@ -7,42 +7,59 @@ import { ArrowLeft, Copy, Check } from "lucide-react";
 const COMPONENTS = [
   {
     name: "BulletList",
-    desc: "List of short items with optional icons",
+    desc: "List of short items with variants for different visual styles",
     example: {
       component: "BulletList",
       props: {
         items: ["First point", "Second point", "Third point"],
-        icon: "check-circle"
+        icon: "check-circle",
+        variant: "highlighted",
+        color: "#10B981"
       }
     },
-    notes: "icon: any Lucide icon name (check-circle, zap, rocket, star, etc). Omit for plain dots."
+    notes: 'variant: "default" (dots/icons), "muted" (gray dashes, dimmed), "highlighted" (bright text, colored icons), "numbered" (numbered circles). color: hex for icon/bullet color.'
+  },
+  {
+    name: "BulletList (muted)",
+    desc: "Dimmed list for 'before' or negative comparisons",
+    example: {
+      component: "BulletList",
+      props: {
+        items: ["Watched 50 hours of tutorials", "Can list 200 AWS services", "Has zero live deployments"],
+        variant: "muted"
+      }
+    },
+    notes: 'Use variant "muted" for grayed-out lists (e.g. "The Tutorial Trap" side of a comparison).'
   },
   {
     name: "Body",
-    desc: "Paragraph text with inline markdown",
+    desc: "Paragraph text with inline markdown and optional callout style",
     example: {
       component: "Body",
       props: {
-        markdown: "This is **bold** and this is *italic* text.\n\nSecond paragraph here."
+        markdown: "The boring parts got automated.\n**The creative parts got amplified.**",
+        variant: "callout",
+        accentColor: "#FF9900"
       }
     },
-    notes: "Supports **bold**, *italic*, `code`. Use \\n\\n for paragraphs, \\n for line breaks."
+    notes: 'variant: "default" (plain), "callout" (dark bg + left accent border), "quote" (italic + muted border). accentColor: hex for callout border.'
   },
   {
     name: "IconCard",
-    desc: "Card with optional icon, title, and description",
+    desc: "Feature card with icon, title, desc, action, tags, footer",
     example: {
       component: "IconCard",
       props: {
-        icon: "rocket",
-        title: "Ship Fast",
-        desc: "Deploy in days, not months",
+        icon: "code",
+        title: "Developer",
+        desc: "Build AI-native apps from day one",
         color: "#FF9900",
-        layout: "horizontal",
-        align: "center"
+        action: "Try this week: Build a chat app with Bedrock",
+        tags: ["KIRO IDE", "BEDROCK", "AMPLIFY"],
+        footer: "\"I went from tutorial hell to building real apps\""
       }
     },
-    notes: 'icon: optional (omit for plain card). layout: "vertical" (default) or "horizontal". align: "left"/"center"/"right".'
+    notes: 'action: highlighted CTA text. tags: array of badge strings. footer: muted italic note. color: tints icon AND title. layout: "vertical"/"horizontal". align: "left"/"center"/"right".'
   },
   {
     name: "CardGrid",

@@ -2,6 +2,8 @@ import React from "react";
 
 interface BodyProps {
   markdown: string;
+  variant?: "default" | "callout" | "quote";
+  accentColor?: string;     // hex color for callout border
   __editable?: boolean;
   __onPropsChange?: (props: Record<string, any>) => void;
 }
@@ -15,7 +17,7 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
 
   while ((match = regex.exec(text)) !== null) {
     if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
-    if (match[2]) parts.push(<strong key={key++}>{match[2]}</strong>);
+    if (match[2]) parts.push(<strong key={key++} style={{ color: "var(--slide-text)" }}>{match[2]}</strong>);
     else if (match[3]) parts.push(<em key={key++}>{match[3]}</em>);
     else if (match[4]) parts.push(<code key={key++} className="px-1.5 py-0.5 rounded text-sm" style={{ backgroundColor: "var(--slide-card-bg)", fontFamily: "var(--slide-font-mono)" }}>{match[4]}</code>);
     lastIndex = match.index + match[0].length;
@@ -24,9 +26,24 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
   return parts;
 }
 
-export function Body({ markdown, __editable, __onPropsChange }: BodyProps) {
+function renderParagraphs(markdown: string) {
   const paragraphs = markdown.split("\n\n");
+  return paragraphs.map((para, i) => {
+    const lines = para.split("\n");
+    return (
+      <p key={i} className="text-lg md:text-xl leading-relaxed">
+        {lines.map((line, j) => (
+          <React.Fragment key={j}>
+            {j > 0 && <br />}
+            {parseInlineMarkdown(line)}
+          </React.Fragment>
+        ))}
+      </p>
+    );
+  });
+}
 
+export function Body({ markdown, variant = "default", accentColor, __editable, __onPropsChange }: BodyProps) {
   if (__editable) {
     return (
       <div
@@ -37,9 +54,7 @@ export function Body({ markdown, __editable, __onPropsChange }: BodyProps) {
         onFocus={(e) => { e.currentTarget.style.borderBottomColor = "var(--slide-primary)"; }}
         onBlur={(e) => {
           e.currentTarget.style.borderBottomColor = "transparent";
-          if (__onPropsChange) {
-            __onPropsChange({ markdown: e.currentTarget.innerText.trim() });
-          }
+          if (__onPropsChange) __onPropsChange({ markdown: e.currentTarget.innerText.trim(), variant, accentColor });
         }}
         onKeyDown={(e) => e.stopPropagation()}
       >
@@ -48,21 +63,40 @@ export function Body({ markdown, __editable, __onPropsChange }: BodyProps) {
     );
   }
 
+  if (variant === "callout") {
+    const borderColor = accentColor || "var(--slide-primary)";
+    return (
+      <div
+        className="rounded-xl px-6 py-5 space-y-2"
+        style={{
+          backgroundColor: "var(--slide-card-bg)",
+          borderLeft: `4px solid ${borderColor}`,
+          color: "var(--slide-text-muted)",
+        }}
+      >
+        {renderParagraphs(markdown)}
+      </div>
+    );
+  }
+
+  if (variant === "quote") {
+    return (
+      <div
+        className="rounded-xl px-6 py-5 space-y-2 italic"
+        style={{
+          backgroundColor: "var(--slide-card-bg)",
+          borderLeft: "4px solid var(--slide-text-muted)",
+          color: "var(--slide-text-muted)",
+        }}
+      >
+        {renderParagraphs(markdown)}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3" style={{ color: "var(--slide-text-muted)" }}>
-      {paragraphs.map((para, i) => {
-        const lines = para.split("\n");
-        return (
-          <p key={i} className="text-lg md:text-xl leading-relaxed">
-            {lines.map((line, j) => (
-              <React.Fragment key={j}>
-                {j > 0 && <br />}
-                {parseInlineMarkdown(line)}
-              </React.Fragment>
-            ))}
-          </p>
-        );
-      })}
+      {renderParagraphs(markdown)}
     </div>
   );
 }
