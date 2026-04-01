@@ -9,6 +9,7 @@ import { getPresentation, savePresentation } from "@/lib/store";
 import { Presentation, PenLine, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import sampleData from "@/lib/sample-presentation.json";
+import { SlideControls } from "@/components/workspace/SlideControls";
 
 export default function WorkspacePage() {
   const params = useParams();
@@ -23,6 +24,13 @@ export default function WorkspacePage() {
     } else {
       const saved = getPresentation(id);
       if (saved) setConfig(saved);
+    }
+  }, [id]);
+
+  const handleConfigUpdate = useCallback((newConfig: PresentationConfig) => {
+    setConfig(newConfig);
+    if (id !== "sample") {
+      savePresentation(newConfig);
     }
   }, [id]);
 
@@ -84,6 +92,7 @@ export default function WorkspacePage() {
             Workspace
           </span>
         </div>
+        <SlideControls config={config} currentSlideIndex={currentSlideIndex} onConfigUpdate={handleConfigUpdate} />
         <div className="flex items-center gap-3">
           <Link
             href="/help"
