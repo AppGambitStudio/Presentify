@@ -9,7 +9,7 @@ import { isValidComponentType, COMPONENT_TYPES } from "@/lib/types";
 
 describe("Type definitions", () => {
   test("COMPONENT_TYPES contains all 20 component types", () => {
-    expect(COMPONENT_TYPES).toHaveLength(20);
+    expect(COMPONENT_TYPES).toHaveLength(21);
     expect(COMPONENT_TYPES).toContain("Heading");
     expect(COMPONENT_TYPES).toContain("Body");
     expect(COMPONENT_TYPES).toContain("BulletList");

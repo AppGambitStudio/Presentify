@@ -33,6 +33,7 @@ export const COMPONENT_TYPES = [
   "ShowcaseCard",
   "HeroIcon",
   "PromptBlock",
+  "MetricRow",
 ] as const;
 
 export type ComponentType = (typeof COMPONENT_TYPES)[number];
@@ -72,6 +73,16 @@ export type Section =
   | ({ type: "full"; component: ComponentType; props: Record<string, any> } & SectionMeta)
   | ({ type: "columns"; columns: SectionItem[] } & SectionMeta);
 
+// --- Slide Style (per-slide overrides) ---
+export interface SlideStyle {
+  backgroundColor?: string;   // override theme bg (hex or CSS gradient)
+  textColor?: string;          // override text color
+  primaryColor?: string;       // override accent/primary color
+  fontFamily?: string;         // override heading font (Google Font name)
+  backgroundImage?: string;    // CSS background-image (url or gradient)
+  overlay?: string;            // overlay color with opacity (e.g. "rgba(0,0,0,0.5)")
+}
+
 // --- Slide ---
 export type SlideDecoration = "glow-pulse" | "rotating-icon" | "gradient-blob" | "shimmer";
 
@@ -83,6 +94,7 @@ export interface Slide {
   titleAccent?: string;
   subtitle?: string;
   gap?: string;             // CSS gap between sections (e.g. "1rem", "2rem"). Default: auto
+  style?: SlideStyle;       // per-slide visual overrides
   sections: Section[];
   speakerNotes: string;
   decorations: SlideDecoration[];

@@ -18,6 +18,7 @@ import { CTABox } from "./CTABox";
 import { ShowcaseCard } from "./ShowcaseCard";
 import { HeroIcon } from "./HeroIcon";
 import { PromptBlock } from "./PromptBlock";
+import { MetricRow } from "./MetricRow";
 
 import type { ComponentType } from "@/lib/types";
 
@@ -26,6 +27,7 @@ export const componentRegistry: Record<ComponentType, React.ComponentType<any>> 
   TwoColumn, StatCallout, QuoteBlock, IconCard, CardGrid,
   CodeBlock, ChartBlock, ImageBlock, TagList, Spacer,
   Divider, CTABox, ShowcaseCard, HeroIcon, PromptBlock,
+  MetricRow,
 };
 
 export {
@@ -33,4 +35,5 @@ export {
   TwoColumn, StatCallout, QuoteBlock, IconCard, CardGrid,
   CodeBlock, ChartBlock, ImageBlock, TagList, Spacer,
   Divider, CTABox, ShowcaseCard, HeroIcon, PromptBlock,
+  MetricRow,
 };

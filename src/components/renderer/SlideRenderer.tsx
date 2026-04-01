@@ -428,9 +428,23 @@ export function SlideRenderer({
       onTitleUpdate={handleTitleUpdate}
       onSubtitleUpdate={handleSubtitleUpdate}
     >
-      <div className="slide-content">
+      <div
+        className="slide-content"
+        style={{
+          ...(slide.style?.backgroundColor ? { "--slide-bg": slide.style.backgroundColor, backgroundColor: slide.style.backgroundColor } as React.CSSProperties : {}),
+          ...(slide.style?.textColor ? { "--slide-text": slide.style.textColor, color: slide.style.textColor } as React.CSSProperties : {}),
+          ...(slide.style?.primaryColor ? { "--slide-primary": slide.style.primaryColor } as React.CSSProperties : {}),
+          ...(slide.style?.fontFamily ? { "--slide-font-heading": `'${slide.style.fontFamily}', sans-serif` } as React.CSSProperties : {}),
+          ...(slide.style?.backgroundImage ? { backgroundImage: slide.style.backgroundImage, backgroundSize: "cover", backgroundPosition: "center" } : {}),
+          position: "relative",
+        }}
+      >
+        {/* Overlay for background images */}
+        {slide.style?.overlay && (
+          <div className="absolute inset-0 z-0" style={{ backgroundColor: slide.style.overlay }} />
+        )}
         <div
-          className="w-full flex-1 flex flex-col justify-center overflow-hidden"
+          className="w-full flex-1 flex flex-col justify-center overflow-hidden relative z-10"
           style={{ gap: resolvedGap }}
         >
           {/* Title area */}
@@ -503,7 +517,7 @@ export function SlideRenderer({
             </div>
           )}
         </div>
-      </div>
+        </div>
     </EditProvider>
   );
 }

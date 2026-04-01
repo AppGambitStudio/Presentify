@@ -7,6 +7,13 @@ Each slide has:
 - subtitle?: string
 - sections: array of content blocks
 - gap?: CSS gap between sections (e.g. "1rem", "2rem", "0.5rem"). Controls vertical spacing.
+- style?: per-slide visual overrides:
+  - backgroundColor: hex or CSS gradient (override theme bg for this slide)
+  - textColor: hex (override text color)
+  - primaryColor: hex (override accent color)
+  - fontFamily: Google Font name (override heading font)
+  - backgroundImage: CSS background-image (url or gradient)
+  - overlay: rgba color for overlay on background image (e.g. "rgba(0,0,0,0.5)")
 - decorations: ["glow-pulse", "gradient-blob", "shimmer"] (optional background effects)
 
 IMPORTANT for titleAccent: the title should contain the FULL text. titleAccent highlights a PORTION of it.
@@ -55,6 +62,7 @@ Sections flow top-to-bottom. Each section is either:
 | ShowcaseCard | title, desc, icon, url, qrCode?, tags[] | Product showcase with QR |
 | HeroIcon | icon, size?, caption, subcaption? | Large decorative icon |
 | PromptBlock | label, code, result, variant? (before/after) | Prompt display |
+| MetricRow | metrics[{value, label, color?}], size? ("default"/"compact"/"large") | Row of big stats side by side |
 | Divider | style? (solid/dashed/gradient) | Separator |
 
 ## Guidelines
