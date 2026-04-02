@@ -143,9 +143,27 @@ export interface IntakeFormData {
   maxSlides: number;           // 0 = auto (based on duration), otherwise cap
 }
 
+export type SlideType = "title" | "agenda" | "context" | "content" | "comparison" | "data" | "demo" | "story" | "quote" | "action" | "closing" | "thankyou";
+
+export const SLIDE_TYPES: { value: SlideType; label: string; desc: string }[] = [
+  { value: "title", label: "Title", desc: "Opening slide with presentation name" },
+  { value: "agenda", label: "Agenda", desc: "Overview of what's coming" },
+  { value: "context", label: "Context", desc: "Set the scene, why this matters" },
+  { value: "content", label: "Content", desc: "Main information slide" },
+  { value: "comparison", label: "Comparison", desc: "Before/after, pros/cons" },
+  { value: "data", label: "Data", desc: "Stats, charts, metrics" },
+  { value: "demo", label: "Demo", desc: "Live demo or walkthrough" },
+  { value: "story", label: "Story", desc: "Case study, anecdote, example" },
+  { value: "quote", label: "Quote", desc: "Key quote or testimonial" },
+  { value: "action", label: "Action", desc: "Call-to-action, next steps" },
+  { value: "closing", label: "Closing", desc: "Summary and wrap-up" },
+  { value: "thankyou", label: "Thank You", desc: "Final slide, contact info" },
+];
+
 export interface OutlineItem {
   number: number;
   summary: string;
+  slideType?: SlideType;      // categorizes the slide for appropriate content generation
   keyMessage?: string;        // the ONE thing the audience should remember
   talkingPoints?: string[];   // 3-5 specific points/facts for this slide
   suggestedComponents?: string; // hint for Sonnet: "StatCallout + CardGrid" or "two-column BulletList"

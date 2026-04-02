@@ -1,5 +1,5 @@
 import { parseJsonResponse } from "./parseResponse";
-import { getAnthropicClient } from "./client";
+import { sendMessage } from "@/lib/ai";
 import { COMPONENT_REFERENCE } from "./componentReference";
 import type { Slide, PresentationConfig } from "@/lib/types";
 
@@ -8,13 +8,11 @@ export async function improviseSlide(
   currentSlide: Slide,
   config: PresentationConfig
 ): Promise<Slide> {
-  const client = getAnthropicClient();
-
   const allSummaries = config.slides.map((s, i) =>
     `  ${i + 1}. ${s.title}${s.summary !== s.title ? ` — ${s.summary}` : ""}`
   ).join("\n");
 
-  const systemPrompt = `You are a senior presentation architect using Opus-level reasoning. A user wants to IMPROVISE a slide — meaning significantly improve its quality, structure, and impact based on their guidance.
+  const systemPrompt = `You are a senior presentation architect. A user wants to IMPROVISE a slide — meaning significantly improve its quality, structure, and impact based on their guidance.
 
 Unlike simple edits, improvisation can completely restructure the slide:
 - Change the layout (e.g. from bullets to comparison table)
@@ -61,17 +59,14 @@ USER'S IMPROVISATION GUIDANCE:
 
 Redesign this slide based on the guidance. Return the improved slide as JSON.`;
 
-  const response = await client.messages.create({
-    model: "claude-opus-4-20250514",
-    max_tokens: 4096,
+  const { text } = await sendMessage({
+    role: "planning",
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],
+    maxTokens: 4096,
   });
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") throw new Error("No response from Opus");
-
-  const improved = parseJsonResponse<Slide>(textBlock.text);
+  const improved = parseJsonResponse<Slide>(text);
   improved.id = currentSlide.id;
   improved.number = currentSlide.number;
   return improved;

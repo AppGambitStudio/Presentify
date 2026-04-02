@@ -1,5 +1,5 @@
 import { parseJsonResponse } from "./parseResponse";
-import { getAnthropicClient } from "./client";
+import { sendMessage } from "@/lib/ai";
 import { COMPONENT_REFERENCE } from "./componentReference";
 import type { Slide, PresentationConfig } from "@/lib/types";
 
@@ -8,8 +8,6 @@ export async function editSlide(
   currentSlide: Slide,
   config: PresentationConfig
 ): Promise<Slide> {
-  const client = getAnthropicClient();
-
   const allSummaries = config.slides.map((s, i) => `  ${i + 1}. ${s.summary}`).join("\n");
 
   const systemPrompt = `You are a presentation slide editor. The user wants to modify a specific slide. You receive the current slide data and a user instruction. Return the COMPLETE updated slide as JSON.
@@ -49,18 +47,14 @@ User request: "${message}"
 
 Return the updated slide as JSON.`;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
+  const { text } = await sendMessage({
+    role: "generation",
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],
+    maxTokens: 2048,
   });
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") throw new Error("No response from edit agent");
-
-  const updated = parseJsonResponse<Slide>(textBlock.text);
-  // Preserve id and number
+  const updated = parseJsonResponse<Slide>(text);
   updated.id = currentSlide.id;
   updated.number = currentSlide.number;
   return updated;

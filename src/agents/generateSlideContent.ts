@@ -1,6 +1,6 @@
 import { parseJsonResponse } from "./parseResponse";
-import { getAnthropicClient } from "./client";
-import { buildSonnetSlidePrompt } from "./prompts";
+import { sendMessage } from "@/lib/ai";
+import { buildSlideGenerationPrompt } from "./prompts";
 import type { OutlineItem, ThemeConfig, Slide } from "@/lib/types";
 
 export async function generateSlideContent(
@@ -10,10 +10,8 @@ export async function generateSlideContent(
   allSummaries: string[],
   intake: { title: string; audience: string; tone: string[]; purpose: string }
 ): Promise<Omit<Slide, "id">> {
-  const client = getAnthropicClient();
   const themeJson = JSON.stringify(theme, null, 2);
 
-  // Build a rich context message with all the detail Opus provided
   const lines = [
     `Presentation: "${intake.title}"`,
     `Audience: ${intake.audience}`,
@@ -22,7 +20,8 @@ export async function generateSlideContent(
     ``,
     `--- THIS SLIDE (${outlineItem.number} of ${totalSlides}) ---`,
     `Summary: ${outlineItem.summary}`,
-  ];
+    outlineItem.slideType ? `Slide type: ${outlineItem.slideType} (generate content appropriate for this type)` : "",
+  ].filter(Boolean);
 
   if (outlineItem.keyMessage) {
     lines.push(`Key message (the ONE thing audience remembers): ${outlineItem.keyMessage}`);
@@ -44,17 +43,14 @@ export async function generateSlideContent(
     lines.push(`  ${i + 1}. ${s}${i + 1 === outlineItem.number ? " ◀ YOU ARE HERE" : ""}`);
   });
 
-  const userMessage = lines.join("\n");
-
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 2048,
-    system: buildSonnetSlidePrompt(themeJson),
-    messages: [{ role: "user", content: userMessage }],
+  const { text } = await sendMessage({
+    role: "generation",
+    system: buildSlideGenerationPrompt(themeJson),
+    messages: [{ role: "user", content: lines.join("\n") }],
+    maxTokens: 2048,
   });
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") throw new Error(`No text response for slide ${outlineItem.number}`);
-  const slideData = parseJsonResponse<any>(textBlock.text);
+
+  const slideData = parseJsonResponse<any>(text);
   return {
     number: outlineItem.number,
     summary: outlineItem.summary,

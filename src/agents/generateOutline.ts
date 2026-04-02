@@ -1,6 +1,6 @@
 import { parseJsonResponse } from "./parseResponse";
-import { getAnthropicClient } from "./client";
-import { OPUS_SYSTEM_PROMPT } from "./prompts";
+import { sendMessage } from "@/lib/ai";
+import { PLANNING_SYSTEM_PROMPT } from "./prompts";
 import type { IntakeFormData, OutlineItem } from "@/lib/types";
 
 function buildUserMessage(intake: IntakeFormData): string {
@@ -20,22 +20,20 @@ function buildUserMessage(intake: IntakeFormData): string {
 }
 
 export async function generateOutline(intake: IntakeFormData): Promise<OutlineItem[]> {
-  const client = getAnthropicClient();
-  const response = await client.messages.create({
-    model: "claude-opus-4-20250514",
-    max_tokens: 4096,
-    system: OPUS_SYSTEM_PROMPT,
+  const { text } = await sendMessage({
+    role: "planning",
+    system: PLANNING_SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildUserMessage(intake) }],
+    maxTokens: 4096,
   });
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") throw new Error("No text response from outline generation");
-  const outline: OutlineItem[] = parseJsonResponse(textBlock.text);
+
+  const outline: OutlineItem[] = parseJsonResponse(text);
   if (!Array.isArray(outline) || outline.length === 0) throw new Error("Invalid outline format");
 
-  // Preserve all rich fields from Opus, renumber
   return outline.map((item, i) => ({
     number: i + 1,
     summary: item.summary,
+    slideType: item.slideType,
     keyMessage: item.keyMessage,
     talkingPoints: item.talkingPoints,
     suggestedComponents: item.suggestedComponents,

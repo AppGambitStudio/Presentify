@@ -71,11 +71,43 @@ Visit [http://localhost:3000](http://localhost:3000)
 ## Tech Stack
 
 - **Next.js** (App Router) + **TypeScript**
-- **Anthropic Claude** — Opus for planning + AImprovise, Sonnet for content generation + chat editing
+- **Multi-provider AI** — Anthropic, OpenRouter, or Ollama (configurable via env)
 - **Tailwind CSS v4** + **Motion/React** (spring animations)
 - **Lucide React** (icons, 60+ brand fallback mappings) + **Recharts** (charts) + **react-qr-code**
 - **localStorage** for persistence (no database)
 - **10 curated color palettes** with guaranteed readability
+
+## AI Provider Configuration
+
+Presentify supports 3 AI providers. Configure in `.env.local`:
+
+### Anthropic (default)
+```env
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### OpenRouter (access 100+ models)
+```env
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=sk-or-...
+AI_MODEL_PLANNING=anthropic/claude-opus-4
+AI_MODEL_GENERATION=anthropic/claude-sonnet-4
+```
+
+### Ollama (local, free)
+```env
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+AI_MODEL_PLANNING=llama3.3
+AI_MODEL_GENERATION=llama3.3
+```
+
+**Model roles:**
+- `AI_MODEL_PLANNING` — used for outline generation and AImprovise (needs strong reasoning)
+- `AI_MODEL_GENERATION` — used for slide content, theme, and chat edits (needs fast JSON output)
+
+You can mix providers by setting different models per role. Check current config at `/api/provider-info`.
 
 ## Routes
 

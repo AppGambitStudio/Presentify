@@ -72,7 +72,7 @@ export function ImproviseButton({ config, currentSlide, onSlideUpdate }: Improvi
 
       {showPopup && (
         <>
-          <div className="fixed inset-0 z-[90]" onClick={() => { if (!isWorking) { setShowPopup(false); setGuidance(""); setError(null); }}} />
+          <div className="fixed inset-0 z-[90]" onClick={() => { if (!isWorking) { setShowPopup(false); setGuidance(""); setError(null); } }} />
           <div
             className="fixed z-[100] p-5 rounded-2xl shadow-2xl w-[420px]"
             style={{
@@ -91,7 +91,7 @@ export function ImproviseButton({ config, currentSlide, onSlideUpdate }: Improvi
                 </h3>
               </div>
               <button
-                onClick={() => { if (!isWorking) { setShowPopup(false); setGuidance(""); setError(null); }}}
+                onClick={() => { if (!isWorking) { setShowPopup(false); setGuidance(""); setError(null); } }}
                 className="p-1"
                 style={{ color: "var(--slide-text-muted)" }}
               >
@@ -152,7 +152,7 @@ export function ImproviseButton({ config, currentSlide, onSlideUpdate }: Improvi
 
             {isWorking && (
               <p className="text-xs text-center mt-2" style={{ color: "var(--slide-text-muted)" }}>
-                Using Claude Opus for deep analysis. This may take a moment.
+                This may take a moment.
               </p>
             )}
           </div>

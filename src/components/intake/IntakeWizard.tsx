@@ -23,10 +23,37 @@ const DEFAULT_FORM: IntakeFormData = {
 
 interface Props { onSubmit: (data: IntakeFormData) => void; }
 
+const DRAFT_KEY = "presentify_intake_draft";
+
+function loadDraft(): { step: number; data: IntakeFormData } {
+  if (typeof window === "undefined") return { step: 0, data: DEFAULT_FORM };
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { step: 0, data: DEFAULT_FORM };
+}
+
+function saveDraft(step: number, data: IntakeFormData) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ step, data })); } catch {}
+}
+
+export function clearIntakeDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+}
+
 export function IntakeWizard({ onSubmit }: Props) {
-  const [step, setStep] = useState(0);
-  const [data, setData] = useState<IntakeFormData>(DEFAULT_FORM);
-  const handleChange = (partial: Partial<IntakeFormData>) => setData((prev) => ({ ...prev, ...partial }));
+  const draft = loadDraft();
+  const [step, setStep] = useState(draft.step);
+  const [data, setData] = useState<IntakeFormData>(draft.data);
+
+  const handleChange = (partial: Partial<IntakeFormData>) => {
+    setData((prev) => {
+      const next = { ...prev, ...partial };
+      saveDraft(step, next);
+      return next;
+    });
+  };
 
   const canProceed = () => {
     switch (step) {
@@ -60,11 +87,11 @@ export function IntakeWizard({ onSubmit }: Props) {
       <p className="mb-8" style={{ color: "var(--slide-text-muted)" }}>{STEPS[step].subtitle}</p>
       {steps[step]}
       <div className="flex justify-between mt-12">
-        <button onClick={() => setStep((s) => s - 1)} disabled={step === 0} className="flex items-center gap-2 px-6 py-3 rounded-xl border transition-all disabled:opacity-20" style={{ borderColor: "var(--slide-card-border)" }}><ChevronLeft size={18} /> Back</button>
+        <button onClick={() => { const s = step - 1; setStep(s); saveDraft(s, data); }} disabled={step === 0} className="flex items-center gap-2 px-6 py-3 rounded-xl border transition-all disabled:opacity-20" style={{ borderColor: "var(--slide-card-border)" }}><ChevronLeft size={18} /> Back</button>
         {step < STEPS.length - 1 ? (
-          <button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()} className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-30" style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}>Next <ChevronRight size={18} /></button>
+          <button onClick={() => { const s = step + 1; setStep(s); saveDraft(s, data); }} disabled={!canProceed()} className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all disabled:opacity-30" style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}>Next <ChevronRight size={18} /></button>
         ) : (
-          <button onClick={() => onSubmit(data)} disabled={!canProceed()} className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-30" style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}><Sparkles size={18} /> Generate Presentation</button>
+          <button onClick={() => { clearIntakeDraft(); onSubmit(data); }} disabled={!canProceed()} className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all disabled:opacity-30" style={{ backgroundColor: "var(--slide-primary)", color: "var(--slide-bg)" }}><Sparkles size={18} /> Generate Presentation</button>
         )}
       </div>
     </div>
