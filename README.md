@@ -31,12 +31,17 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ### Generation
 - 4-step intake wizard (Identity, Context, Structure, Constraints)
+- **12 slide types** — title, agenda, context, content, comparison, data, demo, story, quote, action, closing, thankyou
 - **Max slides limit** — control deck length (Auto / 8 / 12 / 16 / 20 / 25)
 - **10 curated color palettes** — Midnight, Ocean, Sunset, Forest, Royal, Ember, Neon (dark) + Slate, Cream, Arctic (light)
-- **Rich outlines from Opus** — each slide gets key message, talking points, suggested components, and tone
+- **Rich outlines** — each slide gets slide type, key message, talking points, suggested components, and tone
+- **Editable outlines** — modify every field (summary, type, key message, talking points) before generating
+- **Web search enrichment** — Tavily API enriches slides with real facts/stats (optional, free tier: 1,000/month)
+- **Image search** — Unsplash API finds relevant images for visual slides (optional, free tier: 50 req/hr)
 - AI-generated custom themes (or use a palette — skips AI call, saves cost)
 - SSE streaming — watch slides appear one by one as they generate
 - Saved presentations list on landing page with edit/present/delete
+- **Form draft persistence** — intake form saves to localStorage, survives page refresh
 
 ### Editing (Workspace Mode)
 - **AImprovise ✨** — Opus-powered slide redesign. Click the wand button, describe what to improve (or pick from 6 quick suggestions), and Opus rethinks the entire slide structure and content
@@ -108,6 +113,26 @@ AI_MODEL_GENERATION=llama3.3
 - `AI_MODEL_GENERATION` — used for slide content, theme, and chat edits (needs fast JSON output)
 
 You can mix providers by setting different models per role. Check current config at `/api/provider-info`.
+
+## Content Enrichment (Optional)
+
+Add real-world facts and images to your presentations. Both are **optional** -- if keys aren't set, generation works fine without them.
+
+### Web Search (Tavily)
+```env
+TAVILY_API_KEY=tvly-...
+```
+- **Free tier:** 1,000 searches/month (no credit card required)
+- **Sign up:** [tavily.com](https://tavily.com)
+- **What it does:** During generation, searches for real facts/stats related to each slide topic and injects them into the AI prompt. Results in more specific, grounded content instead of generic AI filler.
+
+### Image Search (Unsplash)
+```env
+UNSPLASH_ACCESS_KEY=...
+```
+- **Free tier:** 50 requests/hour (demo), unlimited with approval
+- **Sign up:** [unsplash.com/developers](https://unsplash.com/developers)
+- **What it does:** Finds relevant high-quality photos for visual slides (title, context, story, quote, closing). Images include proper attribution.
 
 ## Routes
 
@@ -216,7 +241,9 @@ src/
 - [ ] BYOK (Bring Your Own Key) per user
 - [ ] Export as standalone HTML
 - [ ] Export as downloadable project
-- [ ] MCP integration (web search, images)
+- [x] Web search enrichment (Tavily)
+- [x] Image search (Unsplash)
+- [ ] MCP server support (Brave Search, Exa)
 - [ ] Undo/redo for edits
 - [ ] Drag-to-reorder slides
 - [ ] Dark/light theme toggle

@@ -10,6 +10,7 @@ export function GenerationProgress({ phase, slidesCompleted, totalSlides }: Prop
         <Loader2 size={48} className="animate-spin mx-auto mb-4" style={{ color: "var(--slide-primary)" }} />
         <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--slide-font-heading)" }}>
           {phase === "generating-theme" && "Designing your theme..."}
+          {phase === "enriching-content" && "Researching facts & finding images..."}
           {phase === "generating-slide" && `Generating slide ${slidesCompleted + 1} of ${totalSlides}...`}
           {!phase && "Starting generation..."}
         </h2>
