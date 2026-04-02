@@ -19,32 +19,39 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ## What It Does
 
-1. **Describe your talk** — 4-step intake form: topic, audience, tone, duration, dos/don'ts
-2. **AI plans the structure** — Claude Opus generates an outline you can review, reorder, add/remove slides
-3. **AI creates slides** — Claude Sonnet generates each slide with components, styling, and animations
-4. **Edit 4 ways** — Chat, click-to-edit text, visual toolbar, or raw JSON editor
-5. **Manage slides** — Add, duplicate, delete, and reorder slides from the toolbar
-6. **Present** — Full-screen animated presentation with keyboard navigation
+1. **Describe your talk** — 4-step intake form: topic, audience, tone, duration, max slides, dos/don'ts
+2. **Pick a color palette** — 10 curated palettes (6 dark + 4 light) or let AI choose
+3. **AI plans the structure** — Claude Opus generates a rich outline with key messages, talking points, and suggested layouts per slide
+4. **AI creates slides** — Claude Sonnet generates each slide using the detailed outline context
+5. **Edit 5 ways** — Chat, click-to-edit text, visual toolbar, JSON editor, or AImprovise with Opus
+6. **Manage slides** — Add (with AI generation), duplicate, delete (with confirmation), and reorder
+7. **Present** — Full-screen animated presentation with keyboard navigation
 
 ## Features
 
 ### Generation
 - 4-step intake wizard (Identity, Context, Structure, Constraints)
-- AI-generated outline with approval checkpoint (reorder, add, delete before generating)
-- AI-generated custom themes (colors, fonts, style based on topic/tone)
+- **Max slides limit** — control deck length (Auto / 8 / 12 / 16 / 20 / 25)
+- **10 curated color palettes** — Midnight, Ocean, Sunset, Forest, Royal, Ember, Neon (dark) + Slate, Cream, Arctic (light)
+- **Rich outlines from Opus** — each slide gets key message, talking points, suggested components, and tone
+- AI-generated custom themes (or use a palette — skips AI call, saves cost)
 - SSE streaming — watch slides appear one by one as they generate
-- Saved presentations list on landing page
+- Saved presentations list on landing page with edit/present/delete
 
 ### Editing (Workspace Mode)
-- **Chat-based editing** — "make S2 more concise", "add a comparison table", "change the tone"
-- **Click-to-edit** — Click any text (titles, bullets, body, quotes) to edit directly
+- **AImprovise ✨** — Opus-powered slide redesign. Click the wand button, describe what to improve (or pick from 6 quick suggestions), and Opus rethinks the entire slide structure and content
+- **Chat-based editing** — "make S2 more concise", "add a comparison table", "change the tone" (powered by Sonnet)
+- **Click-to-edit** — Click any text (titles, bullets, body, quotes) to edit directly — no AI needed
 - **Section toolbar** — Focus a section to get visual controls: alignment, font size, spacing, glass panel, color
 - **JSON editor** — Press `E` for full control over slide data
-- **Slide management** — Add, duplicate, delete, move up/down from the toolbar
+- **AI-powered slide addition** — Click +, describe what the slide should cover, AI generates it with full presentation context
+- **Slide management** — Duplicate, delete (with confirmation), move up/down
+- **Palette switcher** — Change the entire theme instantly from the toolbar
 - **Section IDs** — Each section labeled (S1, S2, S3) for easy reference in chat
 - **Per-slide style overrides** — Background color, text color, accent color, font, background image, overlay
 - **Per-section styles** — Alignment, font scaling (zoom), glass panels, accent borders, spacing, color
 - **Per-column styles** — Style individual columns independently
+- **Confirmation dialogs** — All destructive operations (slide delete, presentation delete) require confirmation
 - **Welcome hints** — First-time overlay explaining all editing methods
 
 ### Components (21)
@@ -64,10 +71,11 @@ Visit [http://localhost:3000](http://localhost:3000)
 ## Tech Stack
 
 - **Next.js** (App Router) + **TypeScript**
-- **Anthropic Claude** — Opus for planning, Sonnet for content generation and editing
+- **Anthropic Claude** — Opus for planning + AImprovise, Sonnet for content generation + chat editing
 - **Tailwind CSS v4** + **Motion/React** (spring animations)
 - **Lucide React** (icons, 60+ brand fallback mappings) + **Recharts** (charts) + **react-qr-code**
 - **localStorage** for persistence (no database)
+- **10 curated color palettes** with guaranteed readability
 
 ## Routes
 
@@ -153,19 +161,20 @@ src/
     api/                # API routes (generate, edit-slide)
     help/               # Component reference docs
   agents/               # Claude AI agents
-    generateOutline.ts  # Outline (Opus)
-    generateTheme.ts    # Theme (Sonnet)
+    generateOutline.ts  # Rich outline (Opus) — key messages + talking points
+    generateTheme.ts    # Theme (Sonnet or palette bypass)
     generateSlideContent.ts  # Slides (Sonnet)
     editSlide.ts        # Chat editing (Sonnet)
+    improviseSlide.ts   # AImprovise redesign (Opus)
     orchestrator.ts     # Batch generation
   components/
     slides/             # 21 slide components
     renderer/           # SlideRenderer, PresentationRenderer, ThemeProvider, SectionToolbar
-    workspace/          # ChatPanel, SlideControls, WelcomeHints
+    workspace/          # ChatPanel, SlideControls, WelcomeHints, ImproviseButton, PaletteSelector, ConfirmDialog
     intake/             # IntakeWizard (4 steps)
     outline/            # OutlineEditor
     generation/         # GenerationView, GenerationProgress
-  lib/                  # Types, store, icon resolver, markdown parser
+  lib/                  # Types, store, icon resolver, markdown parser, palettes
   styles/               # Global CSS + theme variables
 ```
 
