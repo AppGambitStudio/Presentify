@@ -4,8 +4,15 @@ Open-source AI-powered presentation builder. Describe your talk, AI generates be
 
 > **⚠️ IMPORTANT: No authentication is included.** This app uses your Anthropic API key on the backend (`ANTHROPIC_API_KEY`). Every presentation generation and chat edit makes real API calls — Opus for planning, Sonnet for each slide and edit. **Do NOT deploy publicly without adding authentication**, or anyone can use your API key and run up costs. This is designed for **local use or private/internal deployments only**.
 
+### Provide the Presentation Context
 ![alt text](screenshots/2.png)
+
+### Review and Edit the Outline Draft
+![alt text](screenshots/3.png)
+
+### Generate the Presentation
 ![alt text](screenshots/1.png)
+
 
 ## Quick Start
 
