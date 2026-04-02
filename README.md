@@ -91,8 +91,8 @@ ANTHROPIC_API_KEY=sk-ant-...
 ```env
 AI_PROVIDER=openrouter
 OPENROUTER_API_KEY=sk-or-...
-AI_MODEL_PLANNING=anthropic/claude-opus-4
-AI_MODEL_GENERATION=anthropic/claude-sonnet-4
+AI_MODEL_PLANNING=anthropic/claude-opus-4.6
+AI_MODEL_GENERATION=anthropic/claude-sonnet-4.6
 ```
 
 ### Ollama (local, free)
