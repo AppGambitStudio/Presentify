@@ -172,33 +172,103 @@ async function sendOllama(model: string, system: string, messages: AIMessage[], 
   return text;
 }
 
-// --- Unified Send ---
+// --- Retry Config ---
+
+const MAX_RETRIES = parseInt(process.env.AI_MAX_RETRIES || "3", 10);
+const RETRY_DELAY_MS = 2000; // start with 2s, doubles each retry
+
+function isRetryable(error: any): boolean {
+  const msg = String(error?.message || error || "").toLowerCase();
+  // Network errors
+  if (msg.includes("fetch failed") || msg.includes("econnrefused") || msg.includes("econnreset") || msg.includes("timeout") || msg.includes("aborted")) return true;
+  // Rate limits
+  if (msg.includes("429") || msg.includes("rate limit") || msg.includes("too many requests")) return true;
+  // Server errors (5xx)
+  if (msg.includes("500") || msg.includes("502") || msg.includes("503") || msg.includes("504")) return true;
+  // Overloaded
+  if (msg.includes("overloaded") || msg.includes("capacity")) return true;
+  return false;
+}
+
+function isInvalidJson(text: string): boolean {
+  try {
+    // Strip markdown fences first
+    let cleaned = text.trim();
+    if (cleaned.startsWith("```")) {
+      cleaned = cleaned.replace(/^```(?:json|JSON)?\s*\n?/, "").replace(/\n?\s*```$/, "");
+    }
+    JSON.parse(cleaned);
+    return false;
+  } catch {
+    return true;
+  }
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// --- Unified Send with Retry ---
+
+async function sendOnce(provider: AIProvider, model: string, system: string, messages: AIMessage[], maxTokens: number): Promise<string> {
+  switch (provider) {
+    case "anthropic":
+      return sendAnthropic(model, system, messages, maxTokens);
+    case "openrouter":
+      return sendOpenRouter(model, system, messages, maxTokens);
+    case "ollama":
+      return sendOllama(model, system, messages, maxTokens);
+    default:
+      throw new Error(`Unknown AI provider: ${provider}`);
+  }
+}
 
 export async function sendMessage(req: AIRequest): Promise<AIResponse> {
   const provider = getProvider();
   const model = getModelForRole(req.role);
   const maxTokens = req.maxTokens || 4000;
 
-  console.log(`[AI] ${provider}/${model} role=${req.role} maxTokens=${maxTokens}`);
+  let lastError: Error | null = null;
 
-  let text: string;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+        console.log(`[AI] Retry ${attempt}/${MAX_RETRIES} after ${delay}ms...`);
+        await sleep(delay);
+      }
 
-  switch (provider) {
-    case "anthropic":
-      text = await sendAnthropic(model, req.system, req.messages, maxTokens);
-      break;
-    case "openrouter":
-      text = await sendOpenRouter(model, req.system, req.messages, maxTokens);
-      break;
-    case "ollama":
-      text = await sendOllama(model, req.system, req.messages, maxTokens);
-      break;
-    default:
-      throw new Error(`Unknown AI provider: ${provider}`);
+      console.log(`[AI] ${provider}/${model} role=${req.role} maxTokens=${maxTokens}${attempt > 0 ? ` (retry ${attempt})` : ""}`);
+
+      const text = await sendOnce(provider, model, req.system, req.messages, maxTokens);
+
+      // Validate: our system prompts ask for JSON, so check if we got valid JSON
+      if (isInvalidJson(text)) {
+        const preview = text.substring(0, 150);
+        console.warn(`[AI] Invalid JSON response (attempt ${attempt + 1}): ${preview}...`);
+
+        if (attempt < MAX_RETRIES) {
+          lastError = new Error(`Model returned invalid JSON: ${preview}`);
+          continue; // retry
+        }
+        // Last attempt -- return anyway, let the caller's parseJsonResponse handle it
+      }
+
+      console.log(`[AI] Response received (${text.length} chars): ${text.substring(0, 80)}...`);
+      return { text };
+
+    } catch (error: any) {
+      lastError = error;
+      console.error(`[AI] Error (attempt ${attempt + 1}/${MAX_RETRIES + 1}): ${error.message}`);
+
+      if (!isRetryable(error) || attempt >= MAX_RETRIES) {
+        throw error;
+      }
+      // Will retry on next iteration
+    }
   }
 
-  console.log(`[AI] Response received: ${text.substring(0, 100)}...`);
-  return { text };
+  throw lastError || new Error("AI request failed after retries");
 }
 
 /**
