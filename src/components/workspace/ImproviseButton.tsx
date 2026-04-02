@@ -58,11 +58,12 @@ export function ImproviseButton({ config, currentSlide, onSlideUpdate }: Improvi
     <>
       <button
         onClick={() => setShowPopup(true)}
-        className="p-1.5 rounded-lg transition-colors"
+        className="p-1.5 rounded-lg transition-all hover:scale-110"
         style={{
-          color: "var(--slide-text-muted)",
-          backgroundColor: "var(--slide-card-bg)",
-          border: "1px solid var(--slide-card-border)",
+          background: "linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B)",
+          color: "#fff",
+          border: "none",
+          boxShadow: "0 0 8px rgba(139,92,246,0.3)",
         }}
         title="AImprovise this slide (Opus)"
       >
