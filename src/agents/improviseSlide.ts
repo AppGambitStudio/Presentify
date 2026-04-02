@@ -1,4 +1,5 @@
 import { parseJsonResponse } from "./parseResponse";
+import { validateSlide } from "@/lib/validateSlide";
 import { sendMessage } from "@/lib/ai";
 import { COMPONENT_REFERENCE } from "./componentReference";
 import type { Slide, PresentationConfig } from "@/lib/types";
@@ -66,8 +67,7 @@ Redesign this slide based on the guidance. Return the improved slide as JSON.`;
     maxTokens: 4096,
   });
 
-  const improved = parseJsonResponse<Slide>(text);
-  improved.id = currentSlide.id;
-  improved.number = currentSlide.number;
+  const raw = parseJsonResponse<any>(text);
+  const improved = validateSlide({ ...raw, id: currentSlide.id, number: currentSlide.number });
   return improved;
 }

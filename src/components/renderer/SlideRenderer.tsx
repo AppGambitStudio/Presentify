@@ -383,12 +383,26 @@ function SectionRenderer({
 }
 
 export function SlideRenderer({
-  slide,
+  slide: rawSlide,
   showSectionIds = false,
   workspaceMode = false,
   densityMode = "standard",
   onSlideUpdate,
 }: SlideRendererProps) {
+  // Safety: ensure sections is always an array (common AI output issue)
+  const slide = useMemo(() => {
+    if (!Array.isArray(rawSlide.sections)) {
+      const fixed = { ...rawSlide };
+      if (rawSlide.sections && typeof rawSlide.sections === "object" && (rawSlide.sections as any).type) {
+        fixed.sections = [rawSlide.sections as any];
+      } else {
+        fixed.sections = [];
+      }
+      return fixed;
+    }
+    return rawSlide;
+  }, [rawSlide]);
+
   const { base: baseTitle, accent: accentValue } = useMemo(
     () => splitTitle(slide.title, slide.titleAccent),
     [slide.title, slide.titleAccent]

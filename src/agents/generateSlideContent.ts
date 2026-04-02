@@ -1,6 +1,7 @@
 import { parseJsonResponse } from "./parseResponse";
 import { sendMessage } from "@/lib/ai";
 import { buildSlideGenerationPrompt } from "./prompts";
+import { validateSlide } from "@/lib/validateSlide";
 import type { OutlineItem, ThemeConfig, Slide } from "@/lib/types";
 
 export async function generateSlideContent(
@@ -51,14 +52,12 @@ export async function generateSlideContent(
   });
 
   const slideData = parseJsonResponse<any>(text);
-  return {
+  // Validate and sanitize -- fixes common AI output issues
+  const validated = validateSlide({
+    ...slideData,
+    id: `temp_${outlineItem.number}`,
     number: outlineItem.number,
     summary: outlineItem.summary,
-    title: slideData.title || outlineItem.summary,
-    titleAccent: slideData.titleAccent,
-    subtitle: slideData.subtitle,
-    sections: slideData.sections || [],
-    speakerNotes: slideData.speakerNotes || "",
-    decorations: slideData.decorations || [],
-  };
+  });
+  return validated;
 }

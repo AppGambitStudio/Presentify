@@ -1,4 +1,5 @@
 import { parseJsonResponse } from "./parseResponse";
+import { validateSlide } from "@/lib/validateSlide";
 import { sendMessage } from "@/lib/ai";
 import { COMPONENT_REFERENCE } from "./componentReference";
 import type { Slide, PresentationConfig } from "@/lib/types";
@@ -54,8 +55,7 @@ Return the updated slide as JSON.`;
     maxTokens: 2048,
   });
 
-  const updated = parseJsonResponse<Slide>(text);
-  updated.id = currentSlide.id;
-  updated.number = currentSlide.number;
+  const raw = parseJsonResponse<any>(text);
+  const updated = validateSlide({ ...raw, id: currentSlide.id, number: currentSlide.number });
   return updated;
 }
