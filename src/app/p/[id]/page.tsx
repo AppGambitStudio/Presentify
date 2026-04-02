@@ -13,6 +13,7 @@ import { SlideControls } from "@/components/workspace/SlideControls";
 import { PaletteSelector } from "@/components/workspace/PaletteSelector";
 import { PALETTES, type Palette as PaletteType } from "@/lib/palettes";
 import { WelcomeHints } from "@/components/workspace/WelcomeHints";
+import { ImproviseButton } from "@/components/workspace/ImproviseButton";
 
 export default function WorkspacePage() {
   const params = useParams();
@@ -105,7 +106,22 @@ export default function WorkspacePage() {
             Workspace
           </span>
         </div>
-        <SlideControls config={config} currentSlideIndex={currentSlideIndex} onConfigUpdate={handleConfigUpdate} />
+        <div className="flex items-center gap-2">
+          <SlideControls config={config} currentSlideIndex={currentSlideIndex} onConfigUpdate={handleConfigUpdate} />
+          <div className="w-px h-5" style={{ backgroundColor: "var(--slide-card-border)" }} />
+          <ImproviseButton
+            config={config}
+            currentSlide={config.slides[currentSlideIndex]}
+            onSlideUpdate={(improved) => {
+              const newConfig = {
+                ...config,
+                lastModified: new Date().toISOString(),
+                slides: config.slides.map((s) => s.id === improved.id ? improved : s),
+              };
+              handleConfigUpdate(newConfig);
+            }}
+          />
+        </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <button
