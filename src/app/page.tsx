@@ -38,7 +38,7 @@ export default function Home() {
         Presentify
       </h1>
       <p className="text-xl" style={{ color: "var(--slide-text-muted)" }}>
-        AI-powered presentation builder
+        AI-powered Presentation Builder
       </p>
       <Link
         href="/create"
