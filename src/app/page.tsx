@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Sparkles, Trash2, Edit, Presentation as PresentationIcon, Clock } from "lucide-react";
 import { getAllPresentations, deletePresentation } from "@/lib/store";
+import { ConfirmDialog } from "@/components/workspace/ConfirmDialog";
 import type { PresentationConfig } from "@/lib/types";
 
 export default function Home() {
   const [presentations, setPresentations] = useState<PresentationConfig[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<PresentationConfig | null>(null);
 
   useEffect(() => {
     setPresentations(getAllPresentations());
@@ -16,6 +18,7 @@ export default function Home() {
   function handleDelete(id: string) {
     deletePresentation(id);
     setPresentations(getAllPresentations());
+    setDeleteTarget(null);
   }
 
   function formatDate(iso: string) {
@@ -121,7 +124,7 @@ export default function Home() {
                     <PresentationIcon size={14} /> Present
                   </Link>
                   <button
-                    onClick={() => handleDelete(pres.id)}
+                    onClick={() => setDeleteTarget(pres)}
                     title="Delete"
                     className="flex items-center justify-center p-1.5 rounded-lg transition-opacity hover:opacity-75"
                     style={{
@@ -137,6 +140,16 @@ export default function Home() {
             ))}
           </ul>
         </div>
+      )}
+
+      {deleteTarget && (
+        <ConfirmDialog
+          title="Delete presentation?"
+          message={`This will permanently delete "${deleteTarget.title}" (${deleteTarget.slides.length} slides). This cannot be undone.`}
+          confirmLabel="Delete presentation"
+          onConfirm={() => handleDelete(deleteTarget.id)}
+          onCancel={() => setDeleteTarget(null)}
+        />
       )}
     </div>
   );

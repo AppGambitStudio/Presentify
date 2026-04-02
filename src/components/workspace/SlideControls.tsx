@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Trash2, ChevronUp, ChevronDown, Copy, Sparkles, X, Loader2 } from "lucide-react";
+import { ConfirmDialog } from "./ConfirmDialog";
 import type { PresentationConfig, Slide } from "@/lib/types";
 
 interface SlideControlsProps {
@@ -16,6 +17,7 @@ export function SlideControls({ config, currentSlideIndex, onConfigUpdate }: Sli
   const [showAddPrompt, setShowAddPrompt] = useState(false);
   const [newSlideDesc, setNewSlideDesc] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const addSlideWithAI = async () => {
     if (!newSlideDesc.trim()) return;
@@ -117,9 +119,19 @@ export function SlideControls({ config, currentSlideIndex, onConfigUpdate }: Sli
       <button onClick={duplicateSlide} className={btnClass} style={btnStyle} title="Duplicate slide">
         <Copy size={14} />
       </button>
-      <button onClick={deleteSlide} disabled={totalSlides <= 1} className={btnClass} style={{ ...btnStyle, color: totalSlides <= 1 ? "var(--slide-text-muted)" : "#EF4444" }} title="Delete slide">
+      <button onClick={() => setShowDeleteConfirm(true)} disabled={totalSlides <= 1} className={btnClass} style={{ ...btnStyle, color: totalSlides <= 1 ? "var(--slide-text-muted)" : "#EF4444" }} title="Delete slide">
         <Trash2 size={14} />
       </button>
+
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title="Delete slide?"
+          message={`This will remove slide ${currentSlideIndex + 1}: "${currentSlide.title}". This cannot be undone.`}
+          confirmLabel="Delete slide"
+          onConfirm={() => { deleteSlide(); setShowDeleteConfirm(false); }}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
+      )}
 
       {/* Add slide prompt */}
       {showAddPrompt && (
